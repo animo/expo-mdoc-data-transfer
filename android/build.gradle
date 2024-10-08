@@ -25,7 +25,7 @@ if (useManagedAndroidSdkVersions) {
   project.android {
     compileSdkVersion safeExtGet("compileSdkVersion", 34)
     defaultConfig {
-      minSdkVersion safeExtGet("minSdkVersion", 21)
+      minSdkVersion safeExtGet("minSdkVersion", 26)
       targetSdkVersion safeExtGet("targetSdkVersion", 34)
     }
   }
@@ -40,4 +40,9 @@ android {
   lintOptions {
     abortOnError false
   }
+}
+
+dependencies {
+    implementation "eu.europa.ec.eudi:eudi-lib-android-iso18013-data-transfer:0.3.0-SNAPSHOT"
+    implementation "androidx.biometric:biometric-ktx:1.2.0-alpha05"
 }
