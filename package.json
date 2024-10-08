@@ -12,7 +12,6 @@
     "style:check": "biome check --unsafe",
     "style:fix": "pnpm style:check --write",
     "types:check": "EXPO_NONINTERACTIVE=1 expo-module typecheck && EXPO_NONINTERACTIVE=1 expo-module plugin typecheck",
-    "expo-module": "expo-module",
     "open:ios": "xed example/ios",
     "open:android": "open -a \"Android Studio\" example/android",
     "release": "release-it"
@@ -27,7 +26,7 @@
   "homepage": "https://github.com/animo/expo-mdoc-data-transfer#readme",
   "devDependencies": {
     "@biomejs/biome": "1.9.3",
-    "@types/react": "^18.0.25",
+    "@types/react": "~18.2.79",
     "expo-module-scripts": "^3.5.2",
     "expo-modules-core": "^1.12.24"
   },
