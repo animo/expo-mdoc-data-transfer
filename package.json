@@ -26,14 +26,14 @@
   "homepage": "https://github.com/animo/expo-mdoc-data-transfer#readme",
   "devDependencies": {
     "@biomejs/biome": "1.9.3",
-    "@types/react": "18.3.3",
+    "@types/react": "~18.2.79",
     "expo-module-scripts": "3.5.2",
-    "expo-modules-core": "1.12.18",
-    "typescript": "5.5.3"
+    "expo-modules-core": "~1.12.25",
+    "typescript": "~5.3.3"
   },
   "peerDependencies": {
-    "expo": "51.0.17",
-    "react": "18.3.1",
-    "react-native": "0.74.3"
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
   }
 }
