@@ -1,4 +1,7 @@
 import ExpoModulesCore
+//import MdocDataTransfer18013
+import OrderedCollections
+
 
 public class MdocDataTransferModule: Module {
   // Each module class must implement the definition function. The definition consists of components
@@ -30,15 +33,6 @@ public class MdocDataTransferModule: Module {
       self.sendEvent("onChange", [
         "value": value
       ])
-    }
-
-    // Enables the module to be used as a native view. Definition components that are accepted as part of the
-    // view definition: Prop, Events.
-    View(MdocDataTransferView.self) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { (view: MdocDataTransferView, prop: String) in
-        print(prop)
-      }
     }
   }
 }

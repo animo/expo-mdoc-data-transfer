@@ -2,8 +2,8 @@ import { type ConfigPlugin, createRunOncePlugin, withPlugins } from '@expo/confi
 
 import { withAndroid } from './withAndroid'
 
-const withMdocTransportSdk: ConfigPlugin = (config) => {
-  return withPlugins(config, [withAndroid])
-}
+import { withIos } from './withIos'
 
-export default createRunOncePlugin(withMdocTransportSdk, '@animo-id/expo-mdoc-data-transfer')
+const withMdocDataTransfer: ConfigPlugin = (config) => withPlugins(config, [withIos, withAndroid])
+
+export default createRunOncePlugin(withMdocDataTransfer, '@animo-id/mdoc-data-transfer')

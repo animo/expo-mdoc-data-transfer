@@ -9,6 +9,7 @@
     "plugins": [
       "../app.plugin.js",
       "expo-router",
+      "@animo-id/mdoc-data-transfer",
       [
         "expo-build-properties",
         {
@@ -16,6 +17,9 @@
             "minSdkVersion": 26,
             "useLegacyPackaging": true,
             "extraMavenRepos": ["https://s01.oss.sonatype.org/content/repositories/snapshots/"]
+          },
+          "ios": {
+            "deploymentTarget": "14.0"
           }
         }
       ]
