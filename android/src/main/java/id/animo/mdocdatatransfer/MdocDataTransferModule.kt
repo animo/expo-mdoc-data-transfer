@@ -2,6 +2,8 @@ package id.animo.mdocdatatransfer
 
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import eu.europa.ec.eudi.iso18013.transfer.readerauth.ReaderTrustStore
+import java.security.cert.X509Certificate
 
 class MdocDataTransferModule : Module() {
   // Each module class must implement the definition function. The definition consists of components
@@ -23,7 +25,11 @@ class MdocDataTransferModule : Module() {
 
     // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
     Function("hello") {
-      "Hello world! 👋"
+      val certificates = listOf<X509Certificate>(
+        // put trusted reader certificates here
+      )
+      val readerTrustStore = ReaderTrustStore.getDefault(certificates)
+      return@Function "Goodbye World!"
     }
 
     // Defines a JavaScript function that always returns a Promise and whose native code
