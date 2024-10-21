@@ -22,6 +22,7 @@ class MdocDataTransferModule : Module() {
             // We have to re-set the Bouncy Castle provider, otherwise the EUDI library cannot find it correctly
             Security.removeProvider("BC")
             Security.addProvider(BouncyCastleProvider())
+
             mDocDataTransfer = MdocDataTransfer(
                 appContext.reactContext ?: throw Exceptions.ReactContextLost(),
                 appContext.currentActivity ?: throw Exceptions.MissingActivity()

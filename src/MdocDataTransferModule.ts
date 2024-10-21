@@ -10,3 +10,4 @@ export type MdocNativeModule = {
 
 export const mDocNativeModule = requireNativeModule<MdocNativeModule>('MdocDataTransfer')
 export const mDocNativeModuleEventEmitter = new EventEmitter(mDocNativeModule as unknown as NativeModule)
+
