@@ -6,10 +6,6 @@ import { withDangerousMod, withPlugins } from '@expo/config-plugins'
 import { type MergeResults, mergeContents } from '@expo/config-plugins/build/utils/generateCode'
 
 const swiftPackageManagerPackage = `
-  pod 'MdocDataModel18013', :path => '/Users/beri/Developer/work/eudi/eudi-lib-ios-iso18013-data-model'
-  pod 'MdocSecurity18013', :path => '/Users/beri/Developer/work/eudi/eudi-lib-ios-iso18013-security'
-  pod 'MdocDataTransfer18013', :path => '/Users/beri/Developer/work/eudi/eudi-lib-ios-iso18013-data-transfer'
-  pod 'SwiftCertificates', :path => '/Users/beri/Developer/work/apple/swift-certificates'
 `
 
 export function addPod(src: string): MergeResults {
@@ -45,4 +41,3 @@ const withIosPod: ConfigPlugin = (config) => {
 }
 
 export const withIos: ConfigPlugin = (config) => withPlugins(config, [withIosPod])
-

@@ -22,21 +22,23 @@
   "author": "Animo Solutions <development@animo.id> (https://github.com/animo)",
   "license": "Apache-2.0",
   "homepage": "https://github.com/animo/expo-mdoc-data-transfer#readme",
+  "dependencies": {
+    "@expo/config-plugins": "~8.0.0"
+  },
   "devDependencies": {
     "@biomejs/biome": "1.9.3",
-    "@types/node": "^22.7.5",
     "@types/react": "~18.2.79",
     "expo-module-scripts": "3.5.2",
-    "expo-modules-core": "~1.12.25",
+    "expo-modules-core": "~1.12.26",
     "release-it": "^17.4.1",
     "typescript": "~5.3.3"
   },
   "peerDependencies": {
-    "expo": "*",
-    "react": "*",
-    "react-native": "*"
+    "expo": ">= 51",
+    "react": "*"
   },
   "dependencies": {
     "@expo/config-plugins": "^8.0.10"
+    "react-native": ">= 0.75"
   }
 }
