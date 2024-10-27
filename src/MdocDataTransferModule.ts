@@ -1,5 +1,9 @@
 import { requireNativeModule } from 'expo-modules-core'
 
-// It loads the native module object from the JSI or falls back to
-// the bridge module (from NativeModulesProxy) if the remote debugger is on.
-export default requireNativeModule('MdocDataTransfer')
+type MdocNativeModule = {
+  hello: () => string
+}
+
+const mDocNativeModule = requireNativeModule<MdocNativeModule>('MdocDataTransfer')
+
+export const hello = mDocNativeModule.hello

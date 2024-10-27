@@ -35,5 +35,8 @@
     "expo": "*",
     "react": "*",
     "react-native": "*"
+  },
+  "dependencies": {
+    "@expo/config-plugins": "^8.0.10"
   }
 }

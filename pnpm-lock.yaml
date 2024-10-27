@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@expo/config-plugins':
+        specifier: ^8.0.10
+        version: 8.0.10
       expo:
         specifier: '*'
         version: 51.0.17(@babel/core@7.25.7)(@babel/preset-env@7.25.7(@babel/core@7.25.7))
