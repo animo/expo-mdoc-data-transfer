@@ -9,7 +9,6 @@ import java.security.Security
 
 class MdocDataTransferModule : Module() {
     override fun definition() = ModuleDefinition {
-        val context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
         var mDocDataTransfer: MdocDataTransfer? = null
 
         Name("MdocDataTransfer")
@@ -23,16 +22,15 @@ class MdocDataTransferModule : Module() {
             // We have to re-set the Bouncy Castle provider, otherwise the EUDI library cannot find it correctly
             Security.removeProvider("BC")
             Security.addProvider(BouncyCastleProvider())
-
             mDocDataTransfer = MdocDataTransfer(
-                context,
-                sendEvent = { name: String, body: Map<String, Any?>? ->
-                    sendEvent(
-                        name,
-                        body ?: mapOf()
-                    )
-                }
-            )
+                appContext.reactContext ?: throw Exceptions.ReactContextLost(),
+                appContext.currentActivity ?: throw Exceptions.MissingActivity()
+            ) { name: String, body: Map<String, Any?>? ->
+                sendEvent(
+                    name,
+                    body ?: mapOf()
+                )
+            }
 
             return@Function null
         }
@@ -49,14 +47,13 @@ class MdocDataTransferModule : Module() {
         }
 
         Function("sendDeviceResponse") { deviceResponse: ByteArray ->
-            (mDocDataTransfer
-                ?: throw MdocDataTransferException.NotInitialized()).respond(deviceResponse)
+            (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).respond(
+                deviceResponse
+            )
         }
 
         Function("shutdown") {
-            mDocDataTransfer = null
-
-            return@Function null
+            (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).shutdown()
         }
     }
 }
