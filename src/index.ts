@@ -1,1 +1,1 @@
-export * from './MdocDataTransferModule'
+export * from './MdocDataTransfer'

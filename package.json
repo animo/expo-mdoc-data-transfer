@@ -1,5 +1,5 @@
 {
-  "name": "@animo-id/mdoc-data-transfer",
+  "name": "@animo-id/expo-mdoc-data-transfer",
   "version": "0.0.0",
   "description": "Expo mdoc data transfer module",
   "main": "build/index.js",
@@ -12,11 +12,9 @@
     "style:check": "biome check --unsafe",
     "style:fix": "pnpm style:check --write",
     "types:check": "EXPO_NONINTERACTIVE=1 expo-module typecheck && EXPO_NONINTERACTIVE=1 expo-module plugin typecheck",
-    "open:ios": "xed example/ios",
-    "open:android": "open -a \"Android Studio\" example/android",
     "release": "release-it"
   },
-  "keywords": ["react-native", "expo", "@animo-id/mdoc-data-transfer", "MdocDataTransfer"],
+  "keywords": ["react-native", "expo", "@animo-id/expo-mdoc-data-transfer", "MdocDataTransfer"],
   "repository": "https://github.com/animo/expo-mdoc-data-transfer",
   "bugs": {
     "url": "https://github.com/animo/expo-mdoc-data-transfer/issues"

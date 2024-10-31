@@ -19,7 +19,7 @@ config.resolver.nodeModulesPaths = [
 ]
 
 config.resolver.extraNodeModules = {
-  '@animo-id/mdoc-data-transfer': '..',
+  '@animo-id/expo-mdoc-data-transfer': '..',
 }
 
 config.watchFolders = [path.resolve(__dirname, '..')]
