@@ -27,6 +27,7 @@
     "@types/react": "~18.2.79",
     "expo-module-scripts": "3.5.2",
     "expo-modules-core": "~1.12.25",
+    "release-it": "^17.4.1",
     "typescript": "~5.3.3"
   },
   "peerDependencies": {
