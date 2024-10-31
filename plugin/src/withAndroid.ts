@@ -1,5 +1,5 @@
 import type { ConfigPlugin } from '@expo/config-plugins'
-import { withAndroidManifest, withPlugins } from '@expo/config-plugins'
+import { withAndroidManifest, withAppBuildGradle, withPlugins } from '@expo/config-plugins'
 
 const permissions = [
   'android.permission.INTERNET',
@@ -12,6 +12,20 @@ const permissions = [
   'android.permission.ACCESS_FINE_LOCATION',
   'android.permission.ACCESS_COARSE_LOCATION',
 ]
+
+const withAndroidExcludeMetaInf: ConfigPlugin = (expoConfig) =>
+  withAppBuildGradle(expoConfig, (c) => {
+    if (c.modResults.contents.includes('resources.excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")')) return c
+    c.modResults.contents += `packaging { resources.excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF") }`
+    return c
+  })
+
+const withAndroidExcludeBcProv: ConfigPlugin = (expoConfig) =>
+  withAppBuildGradle(expoConfig, (c) => {
+    if (c.modResults.contents.includes("all*.exclude module: 'bcprov-jdk15to18'")) return c
+    c.modResults.contents += `android { configurations { all*.exclude module: 'bcprov-jdk15to18' } }`
+    return c
+  })
 
 // TODO: make it possible to optionally enable NFC
 const withAndroidNfcProperties: ConfigPlugin = (expoConfig) =>
@@ -82,4 +96,9 @@ const withAndroidPermissions: ConfigPlugin = (expoConfig) =>
   })
 
 export const withAndroid: ConfigPlugin = (config) =>
-  withPlugins(config, [withAndroidNfcProperties, withAndroidPermissions])
+  withPlugins(config, [
+    withAndroidExcludeMetaInf,
+    withAndroidExcludeBcProv,
+    withAndroidNfcProperties,
+    withAndroidPermissions,
+  ])
