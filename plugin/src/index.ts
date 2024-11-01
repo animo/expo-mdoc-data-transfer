@@ -1,9 +1,14 @@
 import { type ConfigPlugin, createRunOncePlugin, withPlugins } from '@expo/config-plugins'
 
 import { withAndroid } from './withAndroid'
+import { withIos } from './withIos'
 
-const withMdocTransportSdk: ConfigPlugin = (config) => {
-  return withPlugins(config, [withAndroid])
+export type Props = {
+  ios?: {
+    buildStatic?: Array<string>
+  }
 }
 
-export default createRunOncePlugin(withMdocTransportSdk, '@animo-id/expo-mdoc-data-transfer')
+const withMdocDataTransfer: ConfigPlugin<Props> = (config, props) => withPlugins(config, [withAndroid, withIos(props)])
+
+export default createRunOncePlugin(withMdocDataTransfer, '@animo-id/mdoc-data-transfer')
