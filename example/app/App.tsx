@@ -1,6 +1,6 @@
 import { mdocDataTransfer } from '@animo-id/expo-mdoc-data-transfer'
 import { useState } from 'react'
-import { Button, View } from 'react-native'
+import { Button, Platform, View } from 'react-native'
 import { type Permission, PermissionsAndroid } from 'react-native'
 
 import QrCode from 'react-native-qrcode-svg'
@@ -32,7 +32,7 @@ export const App = () => {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Button title="request permissions" onPress={requestPermissions} />
+      {Platform.OS === 'android' && <Button title="request permissions" onPress={requestPermissions} />}
       <Pad />
       <Button title="start engagement" onPress={startEngagement} />
       <Pad />

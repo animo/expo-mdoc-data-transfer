@@ -7,7 +7,14 @@
     "scheme": "mdoc-data-transfer-example",
     "userInterfaceStyle": "automatic",
     "plugins": [
-      "../app.plugin.js",
+      [
+        "../app.plugin.js",
+        {
+          "ios": {
+            "buildStatic": ["RNReanimated"]
+          }
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -32,6 +39,9 @@
     },
     "ios": {
       "bundleIdentifier": "id.animo.mdocdatatransfer.example"
+    },
+    "splash": {
+      "backgroundColor": "#ffffff"
     }
   }
 }
