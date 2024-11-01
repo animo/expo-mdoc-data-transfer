@@ -46,5 +46,6 @@
     "name": "RNMdocDataTransferSpec",
     "type": "modules",
     "jsSrcsDir": "src"
-  }
+  },
+  "packageManager": "npm@10.2.4+sha256.36b548120f75f26408d04ff163cd4a699916f1c4b72ebeeab0bbaf054009eb5b"
 }
