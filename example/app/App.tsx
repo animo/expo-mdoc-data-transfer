@@ -27,7 +27,7 @@ export const App = () => {
     await mdt.waitForDeviceRequest()
     console.log('--- convert device request into a device response ---')
     await mdt.sendDeviceResponse(new Uint8Array())
-    mdt.shutdown()
+    await mdt.shutdown()
   }
 
   return (

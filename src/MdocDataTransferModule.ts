@@ -1,5 +1,6 @@
-import { EventEmitter, requireNativeModule } from 'expo-modules-core'
-import type { NativeModule } from 'react-native'
+import { EventEmitter } from 'expo-modules-core'
+import { type NativeModule, Platform } from 'react-native'
+import { requireExpoModule, requireTurboModule } from './NativeMdocDataTransfer'
 
 export type MdocNativeModule = {
   initialize: () => void
@@ -8,6 +9,5 @@ export type MdocNativeModule = {
   shutdown: () => void
 }
 
-export const mDocNativeModule = requireNativeModule<MdocNativeModule>('MdocDataTransfer')
+export const mDocNativeModule = Platform.OS === 'ios' ? requireTurboModule() : requireExpoModule()
 export const mDocNativeModuleEventEmitter = new EventEmitter(mDocNativeModule as unknown as NativeModule)
-
