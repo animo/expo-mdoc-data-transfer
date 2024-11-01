@@ -8,7 +8,6 @@
     "userInterfaceStyle": "automatic",
     "plugins": [
       "../app.plugin.js",
-      "@animo-id/mdoc-data-transfer",
       [
         "expo-build-properties",
         {
