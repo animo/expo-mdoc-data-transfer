@@ -2,7 +2,6 @@
 /android/build
 /android/.gradle
 
-/src
 /plugin/src
 tsconfig.json
 .release-it.json
