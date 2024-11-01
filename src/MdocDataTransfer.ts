@@ -44,12 +44,12 @@ class MdocDataTransfer {
 
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
     const p = new Promise(this.onResponseSent)
-    await mDocNativeModule.sendDeviceResponse(deviceResponse)
+    mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))
     await p
   }
 
   public async shutdown() {
-    await mDocNativeModule.shutdown()
+    mDocNativeModule.shutdown()
     instance = undefined
   }
 }

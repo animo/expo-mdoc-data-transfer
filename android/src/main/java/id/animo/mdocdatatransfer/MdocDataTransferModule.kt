@@ -47,9 +47,9 @@ class MdocDataTransferModule : Module() {
             } ?: throw MdocDataTransferException.NotInitialized()
         }
 
-        Function("sendDeviceResponse") { deviceResponse: ByteArray ->
+        Function("sendDeviceResponse") { deviceResponse: String ->
             (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).respond(
-                deviceResponse
+                deviceResponse.split(":").map { it.toByte() }.toByteArray()
             )
         }
 

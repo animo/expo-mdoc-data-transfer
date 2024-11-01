@@ -22,12 +22,13 @@ export const App = () => {
 
   const startEngagement = async () => {
     const mdt = mdocDataTransfer.instance()
-    const qr = await mdt.startQrEngagement()
-    setQrCode(qr)
-    await mdt.waitForDeviceRequest()
-    console.log('--- convert device request into a device response ---')
-    await mdt.sendDeviceResponse(new Uint8Array())
-    await mdt.shutdown()
+    //const qr = await mdt.startQrEngagement()
+    await mdt.sendDeviceResponse(new Uint8Array([1,2,3]))
+    //setQrCode(qr)
+    //await mdt.waitForDeviceRequest()
+    //console.log('--- convert device request into a device response ---')
+    //await mdt.sendDeviceResponse(new Uint8Array())
+    //await mdt.shutdown()
   }
 
   return (

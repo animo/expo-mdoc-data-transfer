@@ -5,14 +5,14 @@ import { TurboModuleRegistry } from 'react-native'
 export type MdocNativeModule = {
   initialize: () => void
   startQrEngagement: () => Promise<string>
-  sendDeviceResponse: (devceResponse: Uint8Array) => void
+  sendDeviceResponse: (devceResponse: string) => void
   shutdown: () => void
 }
 
 export interface Spec extends TurboModule {
   initialize: () => void
   startQrEngagement: () => Promise<string>
-  sendDeviceResponse: (devceResponse: Uint8Array) => void
+  sendDeviceResponse: (devceResponse: string) => void
   shutdown: () => void
 }
 

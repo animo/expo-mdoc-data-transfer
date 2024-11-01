@@ -1,4 +1,4 @@
-name: Pipeline
+oame: Pipeline
 
 on:
   push:
@@ -80,7 +80,7 @@ jobs:
               npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
 
               if [ ${{ inputs.release-type }} == 'alpha' ]; then
-                npm run release --preRelease=alpha
+                npm run release -- --preRelease=alpha
               else
-                npm run release -i=${{ inputs.release-type }}
+                npm run release -- -i=${{ inputs.release-type }}
               fi
