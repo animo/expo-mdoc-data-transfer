@@ -11,7 +11,7 @@
         "../app.plugin.js",
         {
           "ios": {
-            "buildStatic": ["RNReanimated"]
+            "buildStatic": ["RNReanimated", "RNScreens"]
           }
         }
       ],

@@ -5,12 +5,19 @@ import type { Props } from '.'
 const withIosPodfile = (props: Props) => (expoConfig: ExpoConfig) =>
   withPodfile(expoConfig, (c) => {
     if (!props.ios?.buildStatic) return c
+    const staticLibraries = `mdoc_data_transfer_static_libraries=[${props.ios.buildStatic.map((i) => `"${i}"`).join(', ')}]`
+    if (c.modResults.contents.includes('mdoc_data_transfer_static_libraries')) {
+      c.modResults.contents = c.modResults.contents.replace(/mdoc_data_transfer_static_libraries=.*/, staticLibraries)
+    } else {
+      c.modResults.contents += staticLibraries
+    }
+
     if (c.modResults.contents.includes('Pod::BuildType.static_library')) return c
-    const staticLibraries = props.ios.buildStatic.map((l) => `pod.name.eql?('${l}')`).join('||')
+
     c.modResults.contents += `
 pre_install do |installer|
   installer.pod_targets.each do |pod|
-    if ${staticLibraries}
+    if mdoc_data_transfer_static_libraries.include?(pod.name)
       def pod.build_type;
         Pod::BuildType.static_library
       end
