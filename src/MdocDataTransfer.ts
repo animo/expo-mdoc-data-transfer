@@ -30,6 +30,7 @@ class MdocDataTransfer {
       (payload) =>
         cb({
           deviceRequest: new Uint8Array(payload.deviceRequest),
+          sessionTranscript: new Uint8Array(payload.sessionTranscript),
         })
     )
   }
