@@ -40,7 +40,7 @@ class MdocDataTransfer {
   }
 
   public async waitForDeviceRequest() {
-    return (await new Promise<OnRequestReceivedEventPayload<Uint8Array>>(this.onDeviceRequest)).deviceRequest
+    return (await new Promise<OnRequestReceivedEventPayload<Uint8Array>>(this.onDeviceRequest))
   }
 
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
