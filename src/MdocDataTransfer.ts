@@ -24,27 +24,23 @@ class MdocDataTransfer {
     return await mDocNativeModule.startQrEngagement()
   }
 
-  private onDeviceRequest(cb: (payload: OnRequestReceivedEventPayload<Uint8Array>) => Promise<void> | void) {
-    return mDocNativeModuleEventEmitter.addListener<OnRequestReceivedEventPayload>(
-      MdocDataTransferEvent.OnRequestReceived,
-      (payload) =>
-        cb({
-          deviceRequest: new Uint8Array(payload.deviceRequest),
-          sessionTranscript: new Uint8Array(payload.sessionTranscript),
-        })
+  public async waitForDeviceRequest() {
+    return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>((resolve) =>
+      mDocNativeModuleEventEmitter.addListener<OnRequestReceivedEventPayload>(
+        MdocDataTransferEvent.OnRequestReceived,
+        (payload) =>
+          resolve({
+            deviceRequest: new Uint8Array(payload.deviceRequest),
+            sessionTranscript: new Uint8Array(payload.sessionTranscript),
+          })
+      )
     )
   }
 
-  private onResponseSent(cb: (payload: OnResponseSendPayload) => Promise<void> | void) {
-    return mDocNativeModuleEventEmitter.addListener<OnResponseSendPayload>(MdocDataTransferEvent.OnRequestReceived, cb)
-  }
-
-  public async waitForDeviceRequest() {
-    return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>((resolve) => this.onDeviceRequest(resolve))
-  }
-
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
-    const p = new Promise((resolve) => this.onResponseSent(resolve))
+    const p = new Promise((resolve) =>
+      mDocNativeModuleEventEmitter.addListener<OnResponseSendPayload>(MdocDataTransferEvent.OnResponseSent, resolve)
+    )
     mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))
     await p
   }
