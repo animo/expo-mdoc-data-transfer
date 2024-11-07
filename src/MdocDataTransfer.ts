@@ -40,11 +40,11 @@ class MdocDataTransfer {
   }
 
   public async waitForDeviceRequest() {
-    return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>(this.onDeviceRequest)
+    return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>((resolve) => this.onDeviceRequest(resolve))
   }
 
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
-    const p = new Promise(this.onResponseSent)
+    const p = new Promise((resolve) => this.onResponseSent(resolve))
     mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))
     await p
   }

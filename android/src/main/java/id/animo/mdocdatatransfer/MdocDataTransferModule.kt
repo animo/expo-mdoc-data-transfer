@@ -1,5 +1,6 @@
 package id.animo.mdocdatatransfer
 
+import android.util.Log
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
@@ -38,8 +39,10 @@ class MdocDataTransferModule : Module() {
 
 
         AsyncFunction("startQrEngagement") { promise: Promise ->
+            Log.d("ABBA", "cheese")
             mDocDataTransfer?.apply {
                 onQrEngagementReady = { qrCode ->
+                    Log.d("ABBA", "${qrCode}")
                     promise.resolve(qrCode)
                     onQrEngagementReady = null
                 }
