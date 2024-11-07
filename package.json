@@ -14,12 +14,7 @@
     "types:check": "EXPO_NONINTERACTIVE=1 expo-module typecheck && EXPO_NONINTERACTIVE=1 expo-module plugin typecheck",
     "release": "release-it"
   },
-  "keywords": [
-    "react-native",
-    "expo",
-    "@animo-id/expo-mdoc-data-transfer",
-    "MdocDataTransfer"
-  ],
+  "keywords": ["react-native", "expo", "@animo-id/expo-mdoc-data-transfer", "MdocDataTransfer"],
   "repository": "https://github.com/animo/expo-mdoc-data-transfer",
   "bugs": {
     "url": "https://github.com/animo/expo-mdoc-data-transfer/issues"
