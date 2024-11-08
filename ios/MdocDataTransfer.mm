@@ -1,5 +1,5 @@
 #import "MdocDataTransfer.h"
-#import "MdocDataTransfer/MdocDataTransfer-Swift.h"
+#import "MdocDataTransfer-Swift.h"
 
 static MdocDataTransferImpl *mdoc_data_transfer = [MdocDataTransferImpl new];
 
