@@ -42,7 +42,6 @@ class MdocDataTransferModule : Module() {
             Log.d("ABBA", "cheese")
             mDocDataTransfer?.apply {
                 onQrEngagementReady = { qrCode ->
-                    Log.d("ABBA", "${qrCode}")
                     promise.resolve(qrCode)
                     onQrEngagementReady = null
                 }
@@ -52,7 +51,7 @@ class MdocDataTransferModule : Module() {
 
         Function("sendDeviceResponse") { deviceResponse: String ->
             (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).respond(
-                deviceResponse.split(":").map { it.toByte() }.toByteArray()
+                deviceResponse.split(":").map { it.toUInt().toByte() }.toByteArray()
             )
         }
 
