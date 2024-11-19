@@ -7,14 +7,7 @@
     "scheme": "mdoc-data-transfer-example",
     "userInterfaceStyle": "automatic",
     "plugins": [
-      [
-        "../app.plugin.js",
-        {
-          "ios": {
-            "buildStatic": ["RNReanimated", "RNScreens"]
-          }
-        }
-      ],
+      "../app.plugin.js",
       [
         "expo-build-properties",
         {
@@ -22,11 +15,6 @@
             "minSdkVersion": 26,
             "useLegacyPackaging": true,
             "extraMavenRepos": ["https://s01.oss.sonatype.org/content/repositories/snapshots/"]
-          },
-          "ios": {
-            "deploymentTarget": "14.0",
-            "useFrameworks": "dynamic",
-            "newArchEnabled": false
           }
         }
       ]

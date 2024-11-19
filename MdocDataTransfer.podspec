@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.license        = package['license']
   s.author         = package['author']
   s.homepage       = package['homepage']
-  s.platforms      = { :ios => '14.0' }
+  s.platforms      = { :ios => '13.4' }
   s.swift_version  = '5.4'
   s.source         = { git: 'https://github.com/animo/mdoc-data-transfer' }
 
@@ -20,16 +20,5 @@ Pod::Spec.new do |s|
   }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
-  install_modules_dependencies(s)
-
-  if defined?(:spm_dependency)
-    spm_dependency(s,  
-      url: 'https://github.com/eu-digital-identity-wallet/eudi-lib-ios-iso18013-data-transfer.git', 
-      requirement: {kind: 'upToNextMajorVersion', minimumVersion: '0.3.3'}, 
-      products: ['MdocDataTransfer18013'] 
-    ) 
-  else 
-    raise "Please upgrade React Native to >=0.75.0 to use SPM dependencies." 
-  end 
 
 end
