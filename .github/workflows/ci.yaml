@@ -30,57 +30,65 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Style
-        run: npm run style:check
+        run: pnpm style:check
 
       - name: Build
-        run: npm run build
+        run: pnpm build
 
       - name: Check types
-        run: npm run types:check
+        run: pnpm types:check
 
   continuous-deployment:
-      if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
 
-      name: 'Continuous Deployment'
-      runs-on: ubuntu-latest
-      needs: ['continuous-integration']
+    name: 'Continuous Deployment'
+    runs-on: ubuntu-latest
+    needs: ['continuous-integration']
 
-      steps:
-          - uses: actions/checkout@v4
-            with: 
-              fetch-depth: 0
+    steps:
+      - uses: actions/checkout@v4
+        with: 
+          fetch-depth: 0
 
-          - uses: actions/setup-node@v4
-            with:
-              node-version: '18'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-          - name: Install dependencies
-            run: npm install
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
-          - name: Build
-            run: npm run build
+      - name: Install dependencies
+        run: pnpm install
 
-          - name: Set git configuration 
-            run: |
-              git config user.name "Animo Solutions"
-              git config user.email "development@animo.id"
+      - name: Build
+        run: pnpm build
 
-          - name: Publish
-            id: publish
-            env:
-              NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            run: |
-              npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+      - name: Set git configuration 
+        run: |
+          git config user.name "Animo Solutions"
+          git config user.email "development@animo.id"
 
-              if [ ${{ inputs.release-type }} == 'alpha' ]; then
-                npm run release -- --preRelease=alpha
-              else
-                npm run release -- -i=${{ inputs.release-type }}
-              fi
+      - name: Publish
+        id: publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+
+          if [ ${{ inputs.release-type }} == 'alpha' ]; then
+            pnpm release -- --preRelease=alpha
+          else
+            pnpm release -- -i=${{ inputs.release-type }}
+          fi

@@ -10,7 +10,7 @@
   "scripts": {
     "build": "EXPO_NONINTERACTIVE=1 expo-module build && EXPO_NONINTERACTIVE=1 expo-module build plugin",
     "style:check": "biome check --unsafe",
-    "style:fix": "npm run style:check -- --write",
+    "style:fix": "pnpm style:check --write",
     "types:check": "EXPO_NONINTERACTIVE=1 expo-module typecheck && EXPO_NONINTERACTIVE=1 expo-module plugin typecheck",
     "release": "release-it"
   },
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@expo/config-plugins": "^8.0.10",
-    "react-native": ">= 0.75"
+    "react-native": ">= 0.74"
   },
   "codegenConfig": {
     "name": "RNMdocDataTransferSpec",

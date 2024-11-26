@@ -1,5 +1,5 @@
-import { mdocDataTransfer } from '@animo-id/expo-mdoc-data-transfer'
-import { useState } from 'react'
+import { mdocDataTransfer, useMdocDataTransferShutdownOnUnmount } from '@animo-id/expo-mdoc-data-transfer'
+import { useEffect, useState } from 'react'
 import { Button, Platform, View } from 'react-native'
 import { type Permission, PermissionsAndroid } from 'react-native'
 
@@ -20,15 +20,22 @@ const requestPermissions = async () => PermissionsAndroid.requestMultiple(PERMIS
 export const App = () => {
   const [qrCode, setQrCode] = useState<string>()
 
+  useMdocDataTransferShutdownOnUnmount()
+
   const startEngagement = async () => {
     const mdt = mdocDataTransfer.instance()
-    //const qr = await mdt.startQrEngagement()
+    const qr = await mdt.startQrEngagement()
+    mdt.enableNfc()
     await mdt.sendDeviceResponse(new Uint8Array([1, 2, 3]))
-    //setQrCode(qr)
-    //await mdt.waitForDeviceRequest()
-    //console.log('--- convert device request into a device response ---')
-    //await mdt.sendDeviceResponse(new Uint8Array())
-    //await mdt.shutdown()
+    setQrCode(qr)
+    await mdt.waitForDeviceRequest()
+    console.log('--- convert device request into a device response ---')
+    await mdt.sendDeviceResponse(new Uint8Array())
+    mdt.shutdown()
+  }
+
+  const shutdown = () => {
+    mdocDataTransfer.instance().shutdown()
   }
 
   return (
@@ -36,6 +43,8 @@ export const App = () => {
       {Platform.OS === 'android' && <Button title="request permissions" onPress={requestPermissions} />}
       <Pad />
       <Button title="start engagement" onPress={startEngagement} />
+      <Pad />
+      <Button title="shutdown" onPress={shutdown} />
       <Pad />
       {qrCode && <QrCode value={qrCode} size={300} />}
     </View>

@@ -5,7 +5,7 @@ import {
 } from './MdocDataTransferEvent'
 import { mDocNativeModule, mDocNativeModuleEventEmitter } from './MdocDataTransferModule'
 
-let instance: MdocDataTransfer | undefined = undefined
+export let instance: MdocDataTransfer | undefined = undefined
 export const mdocDataTransfer = {
   instance: () => {
     if (instance) return instance
@@ -14,6 +14,8 @@ export const mdocDataTransfer = {
 }
 
 class MdocDataTransfer {
+  public isNfcEnabled = false
+
   public static initialize() {
     mDocNativeModule.initialize()
     instance = new MdocDataTransfer()
@@ -45,8 +47,15 @@ class MdocDataTransfer {
     await p
   }
 
-  public async shutdown() {
+  public shutdown() {
     mDocNativeModule.shutdown()
+    this.isNfcEnabled = false
     instance = undefined
+  }
+
+  public enableNfc() {
+    if (this.isNfcEnabled) return
+    mDocNativeModule.enableNfc()
+    this.isNfcEnabled = true
   }
 }

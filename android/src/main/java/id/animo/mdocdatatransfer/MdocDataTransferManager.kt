@@ -2,7 +2,6 @@ package id.animo.mdocdatatransfer
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import eu.europa.ec.eudi.iso18013.transfer.DocumentsResolver
 import eu.europa.ec.eudi.iso18013.transfer.TransferManager
 import eu.europa.ec.eudi.iso18013.transfer.response.ResponseGenerator
@@ -30,6 +29,7 @@ object MdocDataTransferManager {
                 .apply {
                     documentsResolver = DocumentsResolver { listOf() }
                 }.build()
+
         }.build()
     }
 }

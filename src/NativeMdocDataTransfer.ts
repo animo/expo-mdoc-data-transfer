@@ -4,6 +4,7 @@ export type MdocNativeModule = {
   initialize: () => void
   startQrEngagement: () => Promise<string>
   sendDeviceResponse: (devceResponse: string) => void
+  enableNfc: () => void
   shutdown: () => void
 }
 
