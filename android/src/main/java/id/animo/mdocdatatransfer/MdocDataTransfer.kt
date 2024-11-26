@@ -54,8 +54,8 @@ class MdocDataTransfer(
                             sendEvent(
                                 MdocDataTransferEvent.ON_REQUEST_RECEIVED,
                                 mapOf(
-                                  ("deviceRequest" to request.deviceRequestBytes.asList()),
-                                  ("sessionTranscript" to request.sessionTranscriptBytes.asList())
+                                    ("deviceRequest" to request.deviceRequestBytes.asList()),
+                                    ("sessionTranscript" to request.sessionTranscriptBytes.asList())
                                 )
                             )
                         }
@@ -85,7 +85,16 @@ class MdocDataTransfer(
         MdocDataTransferManager.transferManager.value.sendResponse(deviceResponse)
     }
 
-    fun shutdown() {
+    fun enableNfc() {
+        NfcEngagementService.enable(currentActivity as ComponentActivity)
+    }
+
+    fun disableNfc() {
         NfcEngagementService.disable(currentActivity as ComponentActivity)
+    }
+
+    fun shutdown() {
+        disableNfc()
+        MdocDataTransferManager.transferManager.value.stopPresentation(true, true)
     }
 }
