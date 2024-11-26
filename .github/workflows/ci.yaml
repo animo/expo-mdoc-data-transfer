@@ -79,16 +79,6 @@ jobs:
           git config user.name "Animo Solutions"
           git config user.email "development@animo.id"
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-              if [ ${{ inputs.release-type }} == 'alpha' ]; then
-                npm run release -- --preRelease=alpha
-              else
-                npm run release -- -i=${{ inputs.release-type }}
-              fi
-=======
->>>>>>> f80efb6 (chore: move from npm back to pnpm)
       - name: Publish
         id: publish
         env:
@@ -98,15 +88,7 @@ jobs:
           npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
 
           if [ ${{ inputs.release-type }} == 'alpha' ]; then
-<<<<<<< HEAD
-            pnpm release -- --preRelease=alpha
-          else
-            pnpm release -- -i=${{ inputs.release-type }}
-          fi
-=======
             pnpm release --preRelease=alpha
           else
             pnpm release -i=${{ inputs.release-type }}
           fi
->>>>>>> Stashed changes
->>>>>>> f80efb6 (chore: move from npm back to pnpm)
