@@ -1,13 +1,25 @@
 {
   "expo": {
-    "name": "mdoc-data-transfer-example",
-    "slug": "mdoc-data-transfer-example",
+    "name": "expo-mdoc-data-transfer-example",
+    "slug": "expo-mdoc-data-transfer-example",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "mdoc-data-transfer-example",
-    "userInterfaceStyle": "automatic",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "splash": {
+      "image": "./assets/images/splash.png"
+    },
+    "ios": {
+      "bundleIdentifier": "id.animo.expo-mdoc-data-transfer-example"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "id.animo.expomdocdatatransferexample"
+    },
     "plugins": [
-      "../app.plugin.js",
       [
         "expo-build-properties",
         {
@@ -18,18 +30,6 @@
           }
         }
       ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "android": {
-      "package": "id.animo.mdocdatatransfer.example"
-    },
-    "ios": {
-      "bundleIdentifier": "id.animo.mdocdatatransfer.example"
-    },
-    "splash": {
-      "backgroundColor": "#ffffff"
-    }
+    ]
   }
 }

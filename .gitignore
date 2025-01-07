@@ -36,12 +36,6 @@ android.iml
 android/app/libs
 android/keystores/debug.keystore
 
-# Cocoapods
-example/ios/Pods
-
-# Ruby
-example/vendor/
-
 # node.js
 node_modules/
 npm-debug.log

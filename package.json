@@ -39,10 +39,5 @@
   "dependencies": {
     "@expo/config-plugins": "^8.0.10",
     "react-native": ">= 0.74"
-  },
-  "codegenConfig": {
-    "name": "RNMdocDataTransferSpec",
-    "type": "modules",
-    "jsSrcsDir": "src"
   }
 }
