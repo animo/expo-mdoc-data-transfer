@@ -1,13 +1,4 @@
 import { requireNativeModule } from 'expo-modules-core'
+import type { Spec } from './specs/NativeMdocDataTransfer'
 
-export type MdocNativeModule = {
-  initialize: () => void
-  startQrEngagement: () => Promise<string>
-  sendDeviceResponse: (devceResponse: string) => void
-  enableNfc: () => void
-  shutdown: () => void
-}
-
-export function requireExpoModule() {
-  return requireNativeModule<MdocNativeModule>('MdocDataTransfer')
-}
+export const requireExpoModule = () => requireNativeModule<Spec>('MdocDataTransfer')

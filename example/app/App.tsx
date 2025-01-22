@@ -1,5 +1,5 @@
 import { mdocDataTransfer, useMdocDataTransferShutdownOnUnmount } from '@animo-id/expo-mdoc-data-transfer'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button, Platform, View } from 'react-native'
 import { type Permission, PermissionsAndroid } from 'react-native'
 
