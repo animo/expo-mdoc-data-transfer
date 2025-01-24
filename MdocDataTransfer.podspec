@@ -25,6 +25,8 @@ Pod::Spec.new do |s|
 
   if defined?(:spm_dependency)
     spm_dependency(s,  
+      # Currently we use this fork because it adds a manual `sendDeviceResponse` method
+      # Which we use as we generate this outside of the library
       url: 'https://github.com/berendsliedrecht/eudi-lib-ios-iso18013-data-transfer.git', 
       requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.3.12'}, 
       products: ['MdocDataTransfer18013'] 

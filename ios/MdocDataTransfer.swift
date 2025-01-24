@@ -24,9 +24,9 @@ class MdocDataTransfer: RCTEventEmitter {
     }
 
     @objc
-    func initialize() -> String {
+    func initialize() -> String? {
         guard bleServerTransfer == nil else {
-            return ""
+            return MdocDataTransferError.BleGattServerAlreadyInitialized.localizedDescription
         }
 
         do {
@@ -40,7 +40,7 @@ class MdocDataTransfer: RCTEventEmitter {
             return error.localizedDescription
         }
 
-        return ""
+        return nil
     }
 
     @objc(startQrEngagement:_:)
@@ -62,7 +62,7 @@ class MdocDataTransfer: RCTEventEmitter {
     }
 
     @objc(sendDeviceResponse:)
-    func sendDeviceResponse(deviceResponse: String) -> String {
+    func sendDeviceResponse(deviceResponse: String) -> String? {
         guard let bleServerTransfer = bleServerTransfer,
             var sessionEncryption = bleServerTransfer.sessionEncryption
         else {
@@ -89,11 +89,11 @@ class MdocDataTransfer: RCTEventEmitter {
             return error.localizedDescription
         }
 
-        return ""
+        return nil
     }
 
     @objc
-    func shutdown() -> String {
+    func shutdown() -> String? {
         guard let bleServerTransfer = bleServerTransfer else {
             return MdocDataTransferError.BleGattServerNotInitialized
                 .localizedDescription
@@ -106,7 +106,7 @@ class MdocDataTransfer: RCTEventEmitter {
         rejector = nil
         resolver = nil
 
-        return ""
+        return nil
     }
 
     private func reject(_ message: String) {
