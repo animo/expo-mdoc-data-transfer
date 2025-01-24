@@ -1,6 +1,13 @@
-import { EventEmitter } from 'expo-modules-core'
-import type { NativeModule } from 'react-native'
+import { EventEmitter as ExpoEventEmitter } from 'expo-modules-core'
+import { type NativeModule, NativeModules, Platform, NativeEventEmitter as ReactNativeEventEmitter } from 'react-native'
 import { requireExpoModule } from './NativeMdocDataTransfer'
 
-export const mDocNativeModule = requireExpoModule()
-export const mDocNativeModuleEventEmitter = new EventEmitter(mDocNativeModule as unknown as NativeModule)
+import type { Spec } from './specs/NativeMdocDataTransfer'
+
+const shouldUseExpo = Platform.OS === 'android'
+
+export const mDocNativeModule = shouldUseExpo ? requireExpoModule() : (NativeModules.MdocDataTransfer as Spec)
+
+export const mDocNativeModuleEventEmitter = shouldUseExpo
+  ? new ExpoEventEmitter(mDocNativeModule as unknown as NativeModule)
+  : new ReactNativeEventEmitter(mDocNativeModule as unknown as NativeModule)

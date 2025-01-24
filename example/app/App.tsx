@@ -1,5 +1,5 @@
 import { mdocDataTransfer, useMdocDataTransferShutdownOnUnmount } from '@animo-id/expo-mdoc-data-transfer'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button, Platform, View } from 'react-native'
 import { type Permission, PermissionsAndroid } from 'react-native'
 
@@ -24,10 +24,10 @@ export const App = () => {
 
   const startEngagement = async () => {
     const mdt = mdocDataTransfer.instance()
-    const qr = await mdt.startQrEngagement()
     mdt.enableNfc()
-    await mdt.sendDeviceResponse(new Uint8Array([1, 2, 3]))
+    const qr = await mdt.startQrEngagement()
     setQrCode(qr)
+    await mdt.sendDeviceResponse(new Uint8Array([1, 2, 3]))
     await mdt.waitForDeviceRequest()
     console.log('--- convert device request into a device response ---')
     await mdt.sendDeviceResponse(new Uint8Array())

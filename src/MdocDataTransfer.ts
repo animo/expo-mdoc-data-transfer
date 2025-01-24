@@ -17,7 +17,12 @@ class MdocDataTransfer {
   public isNfcEnabled = false
 
   public static initialize() {
-    mDocNativeModule.initialize()
+    const error = mDocNativeModule.initialize()
+
+    if (typeof error === 'string' && error.length > 0) {
+      throw new Error(error)
+    }
+
     instance = new MdocDataTransfer()
     return instance
   }
@@ -28,28 +33,36 @@ class MdocDataTransfer {
 
   public async waitForDeviceRequest() {
     return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>((resolve) =>
-      mDocNativeModuleEventEmitter.addListener<OnRequestReceivedEventPayload>(
+      mDocNativeModuleEventEmitter.addListener(
         MdocDataTransferEvent.OnRequestReceived,
-        (payload) =>
+        (payload: OnRequestReceivedEventPayload) => {
           resolve({
             deviceRequest: new Uint8Array(payload.deviceRequest),
             sessionTranscript: new Uint8Array(payload.sessionTranscript),
           })
+        }
       )
     )
   }
 
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
-    const p = new Promise((resolve) =>
-      mDocNativeModuleEventEmitter.addListener<OnResponseSendPayload>(MdocDataTransferEvent.OnResponseSent, resolve)
+    const p = new Promise<OnResponseSendPayload>((resolve) =>
+      mDocNativeModuleEventEmitter.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
     )
+
     mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))
+
     await p
   }
 
   public shutdown() {
-    mDocNativeModule.shutdown()
     this.isNfcEnabled = false
+    const error = mDocNativeModule.shutdown()
+
+    if (typeof error === 'string' && error.length > 0) {
+      throw new Error(error)
+    }
+
     instance = undefined
   }
 

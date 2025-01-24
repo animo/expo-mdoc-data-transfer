@@ -29,20 +29,16 @@
     "@types/react": "~18.2.79",
     "expo-module-scripts": "3.5.2",
     "expo-modules-core": "~1.12.26",
+    "react-native": "0.75.3",
     "release-it": "^17.4.1",
     "typescript": "~5.3.3"
   },
   "peerDependencies": {
     "expo": ">= 51",
+    "react-native": ">= 0.75",
     "react": "*"
   },
   "dependencies": {
-    "@expo/config-plugins": "^8.0.10",
-    "react-native": ">= 0.74"
-  },
-  "codegenConfig": {
-    "name": "RNMdocDataTransferSpec",
-    "type": "modules",
-    "jsSrcsDir": "src"
+    "@expo/config-plugins": "^8.0.10"
   }
 }
