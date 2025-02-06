@@ -1,24 +1,152 @@
-import type { ConfigPlugin } from '@expo/config-plugins'
-import { withAndroidManifest, withAppBuildGradle, withPlugins } from '@expo/config-plugins'
+import {
+  AndroidConfig,
+  type ConfigPlugin,
+  withAndroidManifest,
+  withAppBuildGradle,
+  withPlugins,
+} from '@expo/config-plugins'
 
-const permissions = [
-  'android.permission.INTERNET',
-  'android.permission.BLUETOOTH',
-  'android.permission.BLUETOOTH_ADMIN',
-  'android.permission.BLUETOOTH_SCAN',
-  'android.permission.BLUETOOTH_ADVERTISE',
-  'android.permission.BLUETOOTH_CONNECT',
-  'android.permission.ACCESS_BACKGROUND_LOCATION',
-  'android.permission.ACCESS_FINE_LOCATION',
-  'android.permission.ACCESS_COARSE_LOCATION',
-]
+type InnerManifest = AndroidConfig.Manifest.AndroidManifest['manifest']
 
-const withAndroidExcludeMetaInf: ConfigPlugin = (expoConfig) =>
-  withAppBuildGradle(expoConfig, (c) => {
-    if (c.modResults.contents.includes('resources.excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")')) return c
-    c.modResults.contents += `packaging { resources.excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF") }`
-    return c
+type ManifestPermission = InnerManifest['permission']
+
+type ExtraItems = {
+  'tools:targetApi'?: string
+  'android:usesPermissionFlags'?: string
+  'android:maxSdkVersion'?: string
+}
+
+type ManifestUsesPermissionWithExtraItems = {
+  $: AndroidConfig.Manifest.ManifestUsesPermission['$'] & ExtraItems
+}
+
+type AndroidManifest = {
+  manifest: InnerManifest & {
+    permission?: ManifestPermission
+    'uses-permission'?: ManifestUsesPermissionWithExtraItems[]
+    'uses-permission-sdk-23'?: ManifestUsesPermissionWithExtraItems[]
+    'uses-feature'?: InnerManifest['uses-feature']
+  }
+}
+
+const withBleAndroidManifest: ConfigPlugin = (config) =>
+  withAndroidManifest(config, (config) => {
+    config.modResults = addLocationPermissionToManifest(config.modResults)
+    config.modResults = addScanAndAdvertisePermissionToManifest(config.modResults)
+    config.modResults = addConnectPermissionToManifest(config.modResults)
+    config.modResults = addLegacyBlePermissionToManifest(config.modResults)
+
+    return config
   })
+
+function addLocationPermissionToManifest(androidManifest: AndroidManifest) {
+  if (!Array.isArray(androidManifest.manifest['uses-permission-sdk-23'])) {
+    androidManifest.manifest['uses-permission-sdk-23'] = []
+  }
+
+  if (
+    !androidManifest.manifest['uses-permission-sdk-23'].find(
+      (item) => item.$['android:name'] === 'android.permission.ACCESS_COARSE_LOCATION'
+    )
+  ) {
+    androidManifest.manifest['uses-permission-sdk-23'].push({
+      $: {
+        'android:name': 'android.permission.ACCESS_COARSE_LOCATION',
+        'android:maxSdkVersion': '30',
+      },
+    })
+  }
+
+  if (
+    !androidManifest.manifest['uses-permission-sdk-23'].find(
+      (item) => item.$['android:name'] === 'android.permission.ACCESS_FINE_LOCATION'
+    )
+  ) {
+    androidManifest.manifest['uses-permission-sdk-23'].push({
+      $: {
+        'android:name': 'android.permission.ACCESS_FINE_LOCATION',
+        'android:maxSdkVersion': '30',
+      },
+    })
+  }
+
+  return androidManifest
+}
+
+function addLegacyBlePermissionToManifest(androidManifest: AndroidManifest) {
+  if (!Array.isArray(androidManifest.manifest['uses-permission'])) {
+    androidManifest.manifest['uses-permission'] = []
+  }
+
+  if (
+    !androidManifest.manifest['uses-permission'].find(
+      (item) => item.$['android:name'] === 'android.permission.BLUETOOTH'
+    )
+  ) {
+    AndroidConfig.Manifest.ensureToolsAvailable(androidManifest)
+    androidManifest.manifest['uses-permission']?.push({
+      $: {
+        'android:name': 'android.permission.BLUETOOTH',
+        'android:maxSdkVersion': '30',
+      },
+    })
+    androidManifest.manifest['uses-permission']?.push({
+      $: {
+        'android:name': 'android.permission.BLUETOOTH_ADMIN',
+        'android:maxSdkVersion': '30',
+      },
+    })
+  }
+  return androidManifest
+}
+
+function addScanAndAdvertisePermissionToManifest(androidManifest: AndroidManifest) {
+  if (!Array.isArray(androidManifest.manifest['uses-permission'])) {
+    androidManifest.manifest['uses-permission'] = []
+  }
+
+  if (
+    !androidManifest.manifest['uses-permission'].find(
+      (item) => item.$['android:name'] === 'android.permission.BLUETOOTH_SCAN'
+    )
+  ) {
+    AndroidConfig.Manifest.ensureToolsAvailable(androidManifest)
+    androidManifest.manifest['uses-permission']?.push({
+      $: {
+        'android:name': 'android.permission.BLUETOOTH_SCAN',
+        'android:usesPermissionFlags': 'neverForLocation',
+        'tools:targetApi': '31',
+      },
+    })
+    androidManifest.manifest['uses-permission']?.push({
+      $: {
+        'android:name': 'android.permission.BLUETOOTH_ADVERTISE',
+        'tools:targetApi': '31',
+      },
+    })
+  }
+  return androidManifest
+}
+
+function addConnectPermissionToManifest(androidManifest: AndroidManifest) {
+  if (!Array.isArray(androidManifest.manifest['uses-permission'])) {
+    androidManifest.manifest['uses-permission'] = []
+  }
+
+  if (
+    !androidManifest.manifest['uses-permission'].find(
+      (item) => item.$['android:name'] === 'android.permission.BLUETOOTH_CONNECT'
+    )
+  ) {
+    AndroidConfig.Manifest.ensureToolsAvailable(androidManifest)
+    androidManifest.manifest['uses-permission']?.push({
+      $: {
+        'android:name': 'android.permission.BLUETOOTH_CONNECT',
+      },
+    })
+  }
+  return androidManifest
+}
 
 const withAndroidExcludeBcProv: ConfigPlugin = (expoConfig) =>
   withAppBuildGradle(expoConfig, (c) => {
@@ -27,7 +155,6 @@ const withAndroidExcludeBcProv: ConfigPlugin = (expoConfig) =>
     return c
   })
 
-// TODO: make it possible to optionally enable NFC
 const withAndroidNfcProperties: ConfigPlugin = (expoConfig) =>
   withAndroidManifest(expoConfig, (c) => {
     const androidManifest = c.modResults.manifest
@@ -79,26 +206,10 @@ const withAndroidNfcProperties: ConfigPlugin = (expoConfig) =>
     return c
   })
 
-const withAndroidPermissions: ConfigPlugin = (expoConfig) =>
-  withAndroidManifest(expoConfig, (c) => {
-    const androidManifest = c.modResults.manifest
-
-    for (const permission of permissions) {
-      if (androidManifest['uses-permission']?.some((p) => p.$['android:name'] === permission)) continue
-      androidManifest['uses-permission']?.push({
-        $: {
-          'android:name': permission,
-        },
-      })
-    }
-
-    return c
-  })
-
 export const withAndroid: ConfigPlugin = (config) =>
   withPlugins(config, [
-    withAndroidExcludeMetaInf,
+    (c) => AndroidConfig.Permissions.withPermissions(c, ['android.permission.BLUETOOTH_CONNECT']),
+    withBleAndroidManifest,
     withAndroidExcludeBcProv,
     withAndroidNfcProperties,
-    withAndroidPermissions,
   ])

@@ -35,7 +35,7 @@ export const App = () => {
   }
 
   const shutdown = () => {
-    mdocDataTransfer.instance().shutdown()
+   mdocDataTransfer.instance().shutdown()
   }
 
   return (
