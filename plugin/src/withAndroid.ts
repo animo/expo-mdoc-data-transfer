@@ -24,54 +24,18 @@ type AndroidManifest = {
   manifest: InnerManifest & {
     permission?: ManifestPermission
     'uses-permission'?: ManifestUsesPermissionWithExtraItems[]
-    'uses-permission-sdk-23'?: ManifestUsesPermissionWithExtraItems[]
     'uses-feature'?: InnerManifest['uses-feature']
   }
 }
 
 const withBleAndroidManifest: ConfigPlugin = (config) =>
   withAndroidManifest(config, (config) => {
-    config.modResults = addLocationPermissionToManifest(config.modResults)
     config.modResults = addScanAndAdvertisePermissionToManifest(config.modResults)
     config.modResults = addConnectPermissionToManifest(config.modResults)
     config.modResults = addLegacyBlePermissionToManifest(config.modResults)
 
     return config
   })
-
-function addLocationPermissionToManifest(androidManifest: AndroidManifest) {
-  if (!Array.isArray(androidManifest.manifest['uses-permission-sdk-23'])) {
-    androidManifest.manifest['uses-permission-sdk-23'] = []
-  }
-
-  if (
-    !androidManifest.manifest['uses-permission-sdk-23'].find(
-      (item) => item.$['android:name'] === 'android.permission.ACCESS_COARSE_LOCATION'
-    )
-  ) {
-    androidManifest.manifest['uses-permission-sdk-23'].push({
-      $: {
-        'android:name': 'android.permission.ACCESS_COARSE_LOCATION',
-        'android:maxSdkVersion': '30',
-      },
-    })
-  }
-
-  if (
-    !androidManifest.manifest['uses-permission-sdk-23'].find(
-      (item) => item.$['android:name'] === 'android.permission.ACCESS_FINE_LOCATION'
-    )
-  ) {
-    androidManifest.manifest['uses-permission-sdk-23'].push({
-      $: {
-        'android:name': 'android.permission.ACCESS_FINE_LOCATION',
-        'android:maxSdkVersion': '30',
-      },
-    })
-  }
-
-  return androidManifest
-}
 
 function addLegacyBlePermissionToManifest(androidManifest: AndroidManifest) {
   if (!Array.isArray(androidManifest.manifest['uses-permission'])) {
