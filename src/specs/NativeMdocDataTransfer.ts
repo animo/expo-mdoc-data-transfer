@@ -1,6 +1,4 @@
-import { type TurboModule, TurboModuleRegistry } from 'react-native'
-
-export interface Spec extends TurboModule {
+export interface Spec {
   enableNfc: () => void
 
   // String indicates an error on iOS legacy architecture
@@ -13,5 +11,3 @@ export interface Spec extends TurboModule {
   // String indicates an error on iOS legacy architecture
   shutdown: () => undefined | string
 }
-
-export const turboModuleMdocDataTransfer = () => TurboModuleRegistry.getEnforcing<Spec>('MdocDataTransfer')
