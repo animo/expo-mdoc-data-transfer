@@ -8,7 +8,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "plugins": [
-      ["../app.plugin.js", { "ios": { "buildStatic": ["RNReanimated"] } }],
+      [
+        "../app.plugin.js",
+        {
+          "ios": {
+            "buildStatic": ["RNReanimated"]
+          }
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -28,10 +35,12 @@
       "typedRoutes": true
     },
     "android": {
-      "package": "id.animo.mdocdatatransfer.example"
+      "package": "id.animo.mdocdatatransfer.example",
+      "permissions": ["android.permission.BLUETOOTH_CONNECT"]
     },
     "ios": {
-      "bundleIdentifier": "id.animo.mdocdatatransfer.example"
+      "bundleIdentifier": "id.animo.mdocdatatransfer.example",
+      "appleTeamId": "G9667JTP83"
     },
     "splash": {
       "backgroundColor": "#ffffff"
