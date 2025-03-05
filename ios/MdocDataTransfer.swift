@@ -3,6 +3,7 @@ import MdocDataTransfer18013
 import MdocSecurity18013
 import React
 import SwiftCBOR
+import WalletStorage
 
 @objc(MdocDataTransfer)
 class MdocDataTransfer: RCTEventEmitter {
@@ -30,11 +31,17 @@ class MdocDataTransfer: RCTEventEmitter {
         }
 
         do {
-            bleServerTransfer = try MdocGattServer(parameters: [
-                InitializeKeys.document_json_data.rawValue: [],
-                InitializeKeys.trusted_certificates.rawValue: [],
-                InitializeKeys.send_response_manually.rawValue: true,
-            ])
+            bleServerTransfer = try MdocGattServer(parameters: InitializeTransferData(
+                dataFormats: Dictionary(),
+                documentData: Dictionary(),
+                docDisplayNames: Dictionary(),
+                privateKeyData: Dictionary(),
+                trustedCertificates: Array(),
+                deviceAuthMethod: DeviceAuthMethod.deviceSignature.rawValue,
+                idsToDocTypes: Dictionary(),
+                hashingAlgs: Dictionary(),
+                sendDeviceResponseManually: true
+            ))
             bleServerTransfer?.delegate = self
         } catch {
             return error.localizedDescription
@@ -48,48 +55,63 @@ class MdocDataTransfer: RCTEventEmitter {
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock
     ) {
-        resolver = resolve
-        rejector = reject
-
-        guard let bleServerTransfer = bleServerTransfer else {
-            self.reject(
-                MdocDataTransferError.BleGattServerNotInitialized
-                    .localizedDescription)
-            return
+        Task {
+            resolver = resolve
+            rejector = reject
+            
+            guard let bleServerTransfer = bleServerTransfer else {
+                self.reject(
+                    MdocDataTransferError.BleGattServerNotInitialized
+                        .localizedDescription)
+                return
+            }
+            let kcSks = KeyChainSecureKeyStorage(serviceName: "eudiw_kcss" , accessGroup: nil)
+            let ssa = SoftwareSecureArea.create(storage: kcSks)
+            
+            do {
+                try await bleServerTransfer.performDeviceEngagement(secureArea: ssa, crv: .P256)
+            }catch {
+                self.reject(error.localizedDescription)
+            }
         }
-
-        bleServerTransfer.performDeviceEngagement()
     }
 
-    @objc(sendDeviceResponse:)
-    func sendDeviceResponse(deviceResponse: String) -> String? {
-        guard let bleServerTransfer = bleServerTransfer,
-            var sessionEncryption = bleServerTransfer.sessionEncryption
-        else {
-            return MdocDataTransferError.BleGattServerNotInitialized
-                .localizedDescription
-        }
-
-        do {
-            let byteArray = deviceResponse.split(separator: ":").compactMap {
-                UInt8($0)
+    @objc(sendDeviceResponse:_:_:)
+    func sendDeviceResponse(deviceResponse: String,
+                            resolve: @escaping RCTPromiseResolveBlock,
+                            reject: @escaping RCTPromiseRejectBlock) {
+        Task {
+            resolver = resolve
+            rejector = reject
+            
+            guard let bleServerTransfer = bleServerTransfer,
+                  var sessionEncryption = bleServerTransfer.sessionEncryption
+            else {
+                self.reject(MdocDataTransferError.BleGattServerNotInitialized.localizedDescription)
+                return
             }
-            let cipherData = try sessionEncryption.encrypt(byteArray)
-            let sd = SessionData(cipher_data: cipherData, status: 20)
-            try bleServerTransfer.sendResponse(
-                Data(sd.encode(options: CBOROptions())))
-        } catch {
-            let sd = SessionData(cipher_data: nil, status: 11)
+            
             do {
-                try bleServerTransfer.sendResponse(
+                let byteArray = deviceResponse.split(separator: ":").compactMap {
+                    UInt8($0)
+                }
+                let cipherData = try await sessionEncryption.encrypt(byteArray)
+                let sd = SessionData(cipher_data: cipherData, status: 20)
+                try bleServerTransfer.sendDeviceResponse(
                     Data(sd.encode(options: CBOROptions())))
             } catch {
-                return error.localizedDescription
+                let sd = SessionData(cipher_data: nil, status: 11)
+                do {
+                    try bleServerTransfer.sendDeviceResponse(
+                        Data(sd.encode(options: CBOROptions())))
+                } catch {
+                    self.reject(error.localizedDescription)
+                    return
+                }
+                self.reject(error.localizedDescription)
+                return
             }
-            return error.localizedDescription
         }
-
-        return nil
     }
 
     @objc
@@ -171,11 +193,7 @@ extension MdocDataTransfer: MdocOfflineDelegate {
         reject(error.localizedDescription)
     }
 
-    public func didReceiveRequest(
-        _ request: MdocDataTransfer18013.UserRequestInfo?,
-        handleSelected: @escaping (Bool, MdocDataTransfer18013.RequestItems?) ->
-            Void
-    ) {
+    func didReceiveRequest(_ request: MdocDataTransfer18013.UserRequestInfo?, handleSelected: @escaping (Bool, MdocDataTransfer18013.RequestItems?) async -> Void) {
         guard
             let sessionTranscriptBytes = bleServerTransfer?.sessionEncryption?
                 .sessionTranscriptBytes,

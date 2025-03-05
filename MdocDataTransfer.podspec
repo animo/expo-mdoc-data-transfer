@@ -10,9 +10,9 @@ Pod::Spec.new do |s|
   s.license        = package['license']
   s.author         = package['author']
   s.homepage       = package['homepage']
-  s.platforms      = { :ios => '14.0'}
+  s.platforms      = { :ios => '15.0'}
   s.swift_version  = '5.4'
-  s.source         = { :git => "https://github.com/animo/mdoc-data-transfer.git", :tag => "#{s.version}" }
+  s.source         = { :git => "https://github.com/animo/expo-mdoc-data-transfer.git", :tag => "#{s.version}" }
 
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
@@ -28,8 +28,13 @@ Pod::Spec.new do |s|
       # Currently we use this fork because it adds a manual `sendDeviceResponse` method
       # Which we use as we generate this outside of the library
       url: 'https://github.com/berendsliedrecht/eudi-lib-ios-iso18013-data-transfer.git', 
-      requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.3.12'}, 
+      requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.5.7'}, 
       products: ['MdocDataTransfer18013'] 
+    ) 
+    spm_dependency(s,  
+      url: 'https://github.com/berendsliedrecht/eudi-lib-ios-wallet-storage.git', 
+      requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.4.6'}, 
+      products: ['WalletStorage'] 
     ) 
   else 
     raise "Please upgrade React Native to >=0.75.0 to use SPM dependencies." 

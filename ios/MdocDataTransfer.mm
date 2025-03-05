@@ -15,7 +15,9 @@ RCT_EXTERN_METHOD(startQrEngagement
                   : (RCTPromiseResolveBlock)resolve _
                   : (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(sendDeviceResponse : (NSString)deviceResponse)
+RCT_EXTERN_METHOD(sendDeviceResponse: (NSString)deviceResponse
+                  _                 : (RCTPromiseResolveBlock)resolve
+                  _                 : (RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(shutdown)
 
