@@ -6,7 +6,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import eu.europa.ec.eudi.iso18013.transfer.TransferEvent
 import eu.europa.ec.eudi.iso18013.transfer.engagement.NfcEngagementService
-import eu.europa.ec.eudi.iso18013.transfer.response.DeviceRequest
+import eu.europa.ec.eudi.iso18013.transfer.response.device.DeviceRequest
+import eu.europa.ec.eudi.iso18013.transfer.response.device.DeviceResponse
 
 class MdocDataTransfer(
     context: Context,
@@ -49,24 +50,19 @@ class MdocDataTransfer(
 
                 is TransferEvent.RequestReceived -> {
                     Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.RequestReceived")
-                    when (val request = event.request) {
-                        is DeviceRequest -> {
-                            sendEvent(
-                                MdocDataTransferEvent.ON_REQUEST_RECEIVED,
-                                mapOf(
-                                    ("deviceRequest" to request.deviceRequestBytes.asList()),
-                                    ("sessionTranscript" to request.sessionTranscriptBytes.asList())
-                                )
-                            )
-                        }
-                    }
+                    val request = event.request as DeviceRequest
+                    sendEvent(
+                        MdocDataTransferEvent.ON_REQUEST_RECEIVED, mapOf(
+                            "deviceRequest" to request.deviceRequestBytes.asList(),
+                            "sessionTranscript" to request.sessionTranscriptBytes.asList()
+                        )
+                    )
                 }
 
                 is TransferEvent.ResponseSent -> {
                     Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.ResponseSent")
                     sendEvent(
-                        MdocDataTransferEvent.ON_RESPONSE_SENT,
-                        null
+                        MdocDataTransferEvent.ON_RESPONSE_SENT, null
                     )
                 }
             }
@@ -82,7 +78,7 @@ class MdocDataTransfer(
     }
 
     fun respond(deviceResponse: ByteArray) {
-        MdocDataTransferManager.transferManager.value.sendResponse(deviceResponse)
+        MdocDataTransferManager.transferManager.value.sendResponse(DeviceResponse(deviceResponse))
     }
 
     fun enableNfc() {
