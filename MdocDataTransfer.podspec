@@ -24,13 +24,19 @@ Pod::Spec.new do |s|
   install_modules_dependencies(s)
 
   if defined?(:spm_dependency)
-    spm_dependency(s,  
+    spm_dependency(s,
       # Currently we use this fork because it adds a manual `sendDeviceResponse` method
       # Which we use as we generate this outside of the library
-      url: 'https://github.com/berendsliedrecht/eudi-lib-ios-iso18013-data-transfer.git', 
-      requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.3.12'}, 
-      products: ['MdocDataTransfer18013'] 
-    ) 
+      url: 'https://github.com/animo/eudi-lib-ios-iso18013-data-transfer.git',
+      requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.6.3'},
+      products: ['MdocDataTransfer18013']
+    )
+
+    spm_dependency(s,
+      url: 'https://github.com/eu-digital-identity-wallet/eudi-lib-ios-wallet-storage.git',
+      requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.4.8'},
+      products: ['WalletStorage']
+    )
   else 
     raise "Please upgrade React Native to >=0.75.0 to use SPM dependencies." 
   end 

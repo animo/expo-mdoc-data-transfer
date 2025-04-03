@@ -2,11 +2,11 @@ export interface Spec {
   enableNfc: () => void
 
   // String indicates an error on iOS legacy architecture
-  initialize: () => undefined | string
+  initialize: (serviceName: string) => undefined | string
 
   startQrEngagement: () => Promise<string>
 
-  sendDeviceResponse: (devceResponse: string) => void
+  sendDeviceResponse: (devceResponse: string) => Promise<void>
 
   // String indicates an error on iOS legacy architecture
   shutdown: () => undefined | string

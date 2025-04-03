@@ -9,13 +9,14 @@
 
 RCT_EXTERN_METHOD(enableNfc)
 
-RCT_EXTERN_METHOD(initialize)
+RCT_EXTERN_METHOD(initialize:(NSString *)serviceName)
 
-RCT_EXTERN_METHOD(startQrEngagement
-                  : (RCTPromiseResolveBlock)resolve _
-                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(startQrEngagement:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(sendDeviceResponse : (NSString)deviceResponse)
+RCT_EXTERN_METHOD(sendDeviceResponse:(NSString)deviceResponse
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(shutdown)
 

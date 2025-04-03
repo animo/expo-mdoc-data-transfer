@@ -18,7 +18,7 @@ class MdocDataTransferModule : Module() {
             MdocDataTransferEvent.ON_RESPONSE_SENT
         )
 
-        Function("initialize") {
+        Function("initialize") { serviceName: String ->
             // We have to re-set the Bouncy Castle provider, otherwise the EUDI library cannot find it correctly
             Security.removeProvider("BC")
             Security.addProvider(BouncyCastleProvider())
@@ -32,8 +32,6 @@ class MdocDataTransferModule : Module() {
                     body ?: mapOf()
                 )
             }
-
-            return@Function null
         }
 
 

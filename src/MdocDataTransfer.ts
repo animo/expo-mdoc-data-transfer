@@ -7,17 +7,17 @@ import { mDocNativeModule, mDocNativeModuleEventEmitter } from './MdocDataTransf
 
 export let instance: MdocDataTransfer | undefined = undefined
 export const mdocDataTransfer = {
-  instance: () => {
+  instance: (serviceName: string) => {
     if (instance) return instance
-    return MdocDataTransfer.initialize()
+    return MdocDataTransfer.initialize(serviceName)
   },
 }
 
 class MdocDataTransfer {
   public isNfcEnabled = false
 
-  public static initialize() {
-    const error = mDocNativeModule.initialize()
+  public static initialize(serviceName: string) {
+    const error = mDocNativeModule.initialize(serviceName)
 
     if (typeof error === 'string' && error.length > 0) {
       throw new Error(error)
