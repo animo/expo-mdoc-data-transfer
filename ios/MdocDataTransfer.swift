@@ -3,193 +3,219 @@ import MdocDataTransfer18013
 import MdocSecurity18013
 import React
 import SwiftCBOR
+import WalletStorage
 
 @objc(MdocDataTransfer)
 class MdocDataTransfer: RCTEventEmitter {
-    let ON_RESPONSE_SENT_EVENT: String = "onResponseSent"
-    let ON_REQUEST_RECEIVED_EVENT: String = "onRequestReceived"
+  let crv: CoseEcCurve = CoseEcCurve.P256
 
-    var bleServerTransfer: MdocGattServer?
-    var resolver: RCTPromiseResolveBlock?
-    var rejector: RCTPromiseRejectBlock?
+  let ON_RESPONSE_SENT_EVENT: String = "onResponseSent"
+  let ON_REQUEST_RECEIVED_EVENT: String = "onRequestReceived"
 
-    override func supportedEvents() -> [String]! {
-        return ["onResponseSent", "onRequestReceived"]
+  var secureArea: SecureArea?
+  var bleServerTransfer: MdocGattServer?
+  var resolver: RCTPromiseResolveBlock?
+  var rejector: RCTPromiseRejectBlock?
+
+  override func supportedEvents() -> [String]! {
+    return ["onResponseSent", "onRequestReceived"]
+  }
+
+  // NFC is not enabled on iOS
+  @objc func enableNfc() {
+    return
+  }
+
+  @objc func initialize(_ serviceName: String) -> String? {
+    guard bleServerTransfer == nil else {
+      return MdocDataTransferError.BleGattServerAlreadyInitialized.localizedDescription
     }
 
-    // NFC is not enabled on iOS
-    @objc
-    func enableNfc() {
+    secureArea = SoftwareSecureArea.create(
+      storage: KeyChainSecureKeyStorage(serviceName: serviceName, accessGroup: nil))
+
+    do {
+      bleServerTransfer = try MdocGattServer(
+        parameters: InitializeTransferData(
+          dataFormats: [:],
+          documentData: [:],
+          docDisplayNames: [:],
+          privateKeyData: [:],
+          trustedCertificates: [],
+          deviceAuthMethod: DeviceAuthMethod.deviceSignature.rawValue,
+          idsToDocTypes: [:],
+          hashingAlgs: [:],
+          sendDeviceResponseManually: true)
+      )
+      bleServerTransfer?.delegate = self
+    } catch {
+      return error.localizedDescription
+    }
+
+    return nil
+  }
+
+  @objc func startQrEngagement(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    Task {
+      resolver = resolve
+      rejector = reject
+
+      guard let bleServerTransfer = bleServerTransfer, let secureArea = secureArea else {
+        self.reject(
+          MdocDataTransferError.BleGattServerNotInitialized
+            .localizedDescription)
         return
+      }
+
+      do {
+        try await bleServerTransfer.performDeviceEngagement(secureArea: secureArea, crv: crv)
+      } catch {
+        self.reject(error.localizedDescription)
+      }
     }
+  }
 
-    @objc
-    func initialize() -> String? {
-        guard bleServerTransfer == nil else {
-            return MdocDataTransferError.BleGattServerAlreadyInitialized.localizedDescription
+  @objc func sendDeviceResponse(
+    _ deviceResponse: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    Task {
+      resolver = resolve
+      rejector = reject
+
+      guard let bleServerTransfer = bleServerTransfer,
+        var sessionEncryption = bleServerTransfer.sessionEncryption
+      else {
+        self.reject(
+          MdocDataTransferError.BleGattServerNotInitialized
+            .localizedDescription)
+        return
+      }
+
+      do {
+        let byteArray = deviceResponse.split(separator: ":").compactMap {
+          UInt8($0)
         }
-
+        let cipherData = try await sessionEncryption.encrypt(byteArray)
+        let sd = SessionData(cipher_data: cipherData, status: 20)
+        try bleServerTransfer.sendDeviceResponse(
+          Data(sd.encode(options: CBOROptions())))
+      } catch {
+        let sd = SessionData(cipher_data: nil, status: 11)
         do {
-            bleServerTransfer = try MdocGattServer(parameters: [
-                InitializeKeys.document_json_data.rawValue: [],
-                InitializeKeys.trusted_certificates.rawValue: [],
-                InitializeKeys.send_response_manually.rawValue: true,
-            ])
-            bleServerTransfer?.delegate = self
+          try bleServerTransfer.sendDeviceResponse(
+            Data(sd.encode(options: CBOROptions())))
         } catch {
-            return error.localizedDescription
+          self.reject(error.localizedDescription)
+          return
         }
+        self.reject(error.localizedDescription)
+        return
+      }
+      resolve(nil)
+    }
+  }
 
-        return nil
+  @objc func shutdown() -> String? {
+    guard let bleServerTransfer = bleServerTransfer else {
+      return MdocDataTransferError.BleGattServerNotInitialized
+        .localizedDescription
+
     }
 
-    @objc(startQrEngagement:_:)
-    func startQrEngagement(
-        resolve: @escaping RCTPromiseResolveBlock,
-        reject: @escaping RCTPromiseRejectBlock
-    ) {
-        resolver = resolve
-        rejector = reject
+    bleServerTransfer.stop()
 
-        guard let bleServerTransfer = bleServerTransfer else {
-            self.reject(
-                MdocDataTransferError.BleGattServerNotInitialized
-                    .localizedDescription)
-            return
-        }
+    self.bleServerTransfer = nil
+    rejector = nil
+    resolver = nil
 
-        bleServerTransfer.performDeviceEngagement()
+    return nil
+  }
+
+  private func reject(_ message: String) {
+    guard let rejector = rejector else {
+      fatalError(
+        MdocDataTransferError.RejectorNotInitialized
+          .localizedDescription)
     }
+    rejector("ERROR", message, nil)
 
-    @objc(sendDeviceResponse:)
-    func sendDeviceResponse(deviceResponse: String) -> String? {
-        guard let bleServerTransfer = bleServerTransfer,
-            var sessionEncryption = bleServerTransfer.sessionEncryption
-        else {
-            return MdocDataTransferError.BleGattServerNotInitialized
-                .localizedDescription
-        }
+    resolver = nil
+    self.rejector = nil
+  }
 
-        do {
-            let byteArray = deviceResponse.split(separator: ":").compactMap {
-                UInt8($0)
-            }
-            let cipherData = try sessionEncryption.encrypt(byteArray)
-            let sd = SessionData(cipher_data: cipherData, status: 20)
-            try bleServerTransfer.sendResponse(
-                Data(sd.encode(options: CBOROptions())))
-        } catch {
-            let sd = SessionData(cipher_data: nil, status: 11)
-            do {
-                try bleServerTransfer.sendResponse(
-                    Data(sd.encode(options: CBOROptions())))
-            } catch {
-                return error.localizedDescription
-            }
-            return error.localizedDescription
-        }
-
-        return nil
+  private func resolve(_ result: Any?) {
+    guard let resolver = resolver else {
+      fatalError(
+        MdocDataTransferError.ResolverNotInitialized
+          .localizedDescription)
     }
+    resolver(result)
 
-    @objc
-    func shutdown() -> String? {
-        guard let bleServerTransfer = bleServerTransfer else {
-            return MdocDataTransferError.BleGattServerNotInitialized
-                .localizedDescription
-
-        }
-
-        bleServerTransfer.stop()
-
-        self.bleServerTransfer = nil
-        rejector = nil
-        resolver = nil
-
-        return nil
-    }
-
-    private func reject(_ message: String) {
-        guard let rejector = rejector else {
-            fatalError(
-                MdocDataTransferError.RejectorNotInitialized
-                    .localizedDescription)
-        }
-        rejector("ERROR", message, nil)
-
-        resolver = nil
-        self.rejector = nil
-    }
-
-    private func resolve(_ result: Any) {
-        guard let resolver = resolver else {
-            fatalError(
-                MdocDataTransferError.ResolverNotInitialized
-                    .localizedDescription)
-        }
-        resolver(result)
-
-        self.resolver = nil
-        rejector = nil
-    }
+    self.resolver = nil
+    rejector = nil
+  }
 }
 
 extension MdocDataTransfer: MdocOfflineDelegate {
-    public func didChangeStatus(
-        _ newStatus: MdocDataTransfer18013.TransferStatus
-    ) {
-        guard let bleServerTransfer = bleServerTransfer else {
-            reject(
-                MdocDataTransferError.BleGattServerNotInitialized
-                    .localizedDescription)
-            return
-        }
-
-        switch newStatus {
-        case .qrEngagementReady:
-            guard let qrCode = bleServerTransfer.qrCodePayload else {
-                reject(MdocDataTransferError.QrCodeNotSet.localizedDescription)
-                return
-            }
-            resolve(qrCode)
-        case .error:
-            guard let error = bleServerTransfer.error else {
-                reject(MdocDataTransferError.ErrorNotSet.localizedDescription)
-                return
-            }
-            reject(error.localizedDescription)
-            return
-        case .responseSent:
-            sendEvent(withName: ON_RESPONSE_SENT_EVENT, body: nil)
-        default:
-            os_log("data transfer status change: %@", newStatus.rawValue)
-        }
-
+  public func didChangeStatus(
+    _ newStatus: MdocDataTransfer18013.TransferStatus
+  ) {
+    guard let bleServerTransfer = bleServerTransfer else {
+      reject(
+        MdocDataTransferError.BleGattServerNotInitialized
+          .localizedDescription)
+      return
     }
 
-    public func didFinishedWithError(_ error: any Error) {
-        reject(error.localizedDescription)
+    switch newStatus {
+    case .qrEngagementReady:
+      guard let qrCode = bleServerTransfer.qrCodePayload else {
+        reject(MdocDataTransferError.QrCodeNotSet.localizedDescription)
+        return
+      }
+      resolve(qrCode)
+    case .error:
+      guard let error = bleServerTransfer.error else {
+        reject(MdocDataTransferError.ErrorNotSet.localizedDescription)
+        return
+      }
+      reject(error.localizedDescription)
+      return
+    case .responseSent:
+      sendEvent(withName: ON_RESPONSE_SENT_EVENT, body: nil)
+    default:
+      os_log("data transfer status change: %@", newStatus.rawValue)
     }
 
-    public func didReceiveRequest(
-        _ request: MdocDataTransfer18013.UserRequestInfo?,
-        handleSelected: @escaping (Bool, MdocDataTransfer18013.RequestItems?) ->
-            Void
-    ) {
-        guard
-            let sessionTranscriptBytes = bleServerTransfer?.sessionEncryption?
-                .sessionTranscriptBytes,
-            let deviceRequestBytes = bleServerTransfer?.deviceRequest?.encode(
-                options: CBOROptions())
-        else {
-            return
-        }
+  }
 
-        sendEvent(
-            withName: ON_REQUEST_RECEIVED_EVENT,
-            body: [
-                "sessionTranscript": sessionTranscriptBytes,
-                "deviceRequest": deviceRequestBytes,
-            ])
+  public func didFinishedWithError(_ error: any Error) {
+    reject(error.localizedDescription)
+  }
+
+  public func didReceiveRequest(
+    _ request: MdocDataTransfer18013.UserRequestInfo?,
+    handleSelected: @escaping (Bool, MdocDataTransfer18013.RequestItems?) async -> Void
+  ) {
+    guard
+      let sessionTranscriptBytes = bleServerTransfer?.sessionEncryption?
+        .sessionTranscriptBytes,
+      let deviceRequestBytes = bleServerTransfer?.deviceRequest?.encode(
+        options: CBOROptions())
+    else {
+      return
     }
+
+    sendEvent(
+      withName: ON_REQUEST_RECEIVED_EVENT,
+      body: [
+        "sessionTranscript": sessionTranscriptBytes,
+        "deviceRequest": deviceRequestBytes,
+      ])
+  }
 }

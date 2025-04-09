@@ -19,30 +19,37 @@ const requestPermissions = async () => PermissionsAndroid.requestMultiple(PERMIS
 
 export const App = () => {
   const [qrCode, setQrCode] = useState<string>()
+  const [mdt, setMdt] = useState<ReturnType<typeof mdocDataTransfer.instance>>()
 
   useMdocDataTransferShutdownOnUnmount()
 
-  const startEngagement = async () => {
-    const mdt = mdocDataTransfer.instance()
-    mdt.enableNfc()
-    const qr = await mdt.startQrEngagement()
+  const start = () => setMdt(mdocDataTransfer.instance('ma_service'))
+  const enableNfc = () => mdt?.enableNfc()
+  const engagement = async () => {
+    const qr = await mdt?.startQrEngagement()
     setQrCode(qr)
-    await mdt.sendDeviceResponse(new Uint8Array([1, 2, 3]))
-    await mdt.waitForDeviceRequest()
-    console.log('--- convert device request into a device response ---')
-    await mdt.sendDeviceResponse(new Uint8Array())
-    mdt.shutdown()
+  }
+
+  const sendDeviceResponse = async () => {
+    await mdt?.sendDeviceResponse(new Uint8Array([1, 2, 3]))
+    await mdt?.waitForDeviceRequest()
   }
 
   const shutdown = () => {
-    mdocDataTransfer.instance().shutdown()
+    mdt?.shutdown()
   }
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       {Platform.OS === 'android' && <Button title="request permissions" onPress={requestPermissions} />}
       <Pad />
-      <Button title="start engagement" onPress={startEngagement} />
+      <Button title="start engagement" onPress={start} />
+      <Pad />
+      <Button title="enable nfc" onPress={enableNfc} />
+      <Pad />
+      <Button title="engagement" onPress={engagement} />
+      <Pad />
+      <Button title="send device desponse" onPress={sendDeviceResponse} />
       <Pad />
       <Button title="shutdown" onPress={shutdown} />
       <Pad />
