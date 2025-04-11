@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
       # Currently we use this fork because it adds a manual `sendDeviceResponse` method
       # Which we use as we generate this outside of the library
       url: 'https://github.com/animo/eudi-lib-ios-iso18013-data-transfer.git',
-      requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.6.3'},
+      requirement: {kind: 'upToNextMinorVersion', minimumVersion: '0.6.4'},
       products: ['MdocDataTransfer18013']
     )
 
