@@ -7,22 +7,18 @@ import { mDocNativeModule, mDocNativeModuleEventEmitter } from './MdocDataTransf
 
 export let instance: MdocDataTransfer | undefined = undefined
 export const mdocDataTransfer = {
-  instance: (serviceName: string) => {
+  instance: async (serviceName: string, trustedCertificates: Array<string> = []) => {
     if (instance) return instance
-    return MdocDataTransfer.initialize(serviceName)
+    const i = await MdocDataTransfer.initialize(serviceName, trustedCertificates)
+    return i
   },
 }
 
 class MdocDataTransfer {
   public isNfcEnabled = false
 
-  public static initialize(serviceName: string) {
-    const error = mDocNativeModule.initialize(serviceName)
-
-    if (typeof error === 'string' && error.length > 0) {
-      throw new Error(error)
-    }
-
+  public static async initialize(serviceName: string, trustedCertificates: Array<string> = []) {
+    await mDocNativeModule.initialize(serviceName, trustedCertificates)
     instance = new MdocDataTransfer()
     return instance
   }
@@ -57,12 +53,7 @@ class MdocDataTransfer {
 
   public shutdown() {
     this.isNfcEnabled = false
-    const error = mDocNativeModule.shutdown()
-
-    if (typeof error === 'string' && error.length > 0) {
-      throw new Error(error)
-    }
-
+    mDocNativeModule.shutdown()
     instance = undefined
   }
 

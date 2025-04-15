@@ -1,7 +1,7 @@
 public enum MdocDataTransferError: Error {
   case BleGattServerNotInitialized
   case BleGattServerAlreadyInitialized
-  case DocumentsNotProvided
+  case InvalidTrustedCertificate
   case RejectorNotInitialized
   case ResolverNotInitialized
   case QrCodeNotSet
@@ -19,8 +19,8 @@ extension MdocDataTransferError: LocalizedError {
       return NSLocalizedString(
         "Ble Gatt Server is already initialized. Please call `shutdown()` before initializing again.",
         comment: "")
-    case .DocumentsNotProvided:
-      return NSLocalizedString("Documents are not provided.", comment: "")
+    case .InvalidTrustedCertificate:
+      return NSLocalizedString("InvalidTrustedCertificate", comment: "")
     case .RejectorNotInitialized:
       return NSLocalizedString(
         "Rejector is not initialized. Invalid state. Bug occurred.",
