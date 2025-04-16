@@ -12,61 +12,65 @@ import eu.europa.ec.eudi.iso18013.transfer.response.device.DeviceResponse
 class MdocDataTransfer(
     context: Context,
     private val currentActivity: Activity,
-    sendEvent: (name: String, body: Map<String, Any?>?) -> Unit
+    trustedCertificates: Array<String>,
+    sendEvent: (name: String, body: Map<String, Any?>?) -> Unit,
 ) {
     companion object {
         private val TAG = Companion::class.java.simpleName
     }
 
     init {
-        MdocDataTransferManager.init(context)
+        MdocDataTransferManager.init(context, trustedCertificates)
 
-        val transferEventListener = TransferEvent.Listener { event ->
-            when (event) {
-                is TransferEvent.QrEngagementReady -> {
-                    Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.QrEngagementReady")
-                    onQrEngagementReady?.let { it(event.qrCode.content) }
-                }
+        val transferEventListener =
+            TransferEvent.Listener { event ->
+                when (event) {
+                    is TransferEvent.QrEngagementReady -> {
+                        Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.QrEngagementReady")
+                        onQrEngagementReady?.let { it(event.qrCode.content) }
+                    }
 
-                is TransferEvent.Connecting -> {
-                    Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Connecting")
-                }
+                    is TransferEvent.Connecting -> {
+                        Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Connecting")
+                    }
 
-                is TransferEvent.Connected -> {
-                    Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Connected")
-                }
+                    is TransferEvent.Connected -> {
+                        Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Connected")
+                    }
 
-                is TransferEvent.Disconnected -> {
-                    Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Disconnected")
-                }
+                    is TransferEvent.Disconnected -> {
+                        Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Disconnected")
+                    }
 
-                is TransferEvent.Error -> {
-                    Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Error")
-                }
+                    is TransferEvent.Error -> {
+                        Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Error")
+                    }
 
-                is TransferEvent.Redirect -> {
-                    Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Redirect")
-                }
+                    is TransferEvent.Redirect -> {
+                        Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.Redirect")
+                    }
 
-                is TransferEvent.RequestReceived -> {
-                    Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.RequestReceived")
-                    val request = event.request as DeviceRequest
-                    sendEvent(
-                        MdocDataTransferEvent.ON_REQUEST_RECEIVED, mapOf(
-                            "deviceRequest" to request.deviceRequestBytes.asList(),
-                            "sessionTranscript" to request.sessionTranscriptBytes.asList()
+                    is TransferEvent.RequestReceived -> {
+                        Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.RequestReceived")
+                        val request = event.request as DeviceRequest
+                        sendEvent(
+                            MdocDataTransferEvent.ON_REQUEST_RECEIVED,
+                            mapOf(
+                                "deviceRequest" to request.deviceRequestBytes.asList(),
+                                "sessionTranscript" to request.sessionTranscriptBytes.asList(),
+                            ),
                         )
-                    )
-                }
+                    }
 
-                is TransferEvent.ResponseSent -> {
-                    Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.ResponseSent")
-                    sendEvent(
-                        MdocDataTransferEvent.ON_RESPONSE_SENT, null
-                    )
+                    is TransferEvent.ResponseSent -> {
+                        Log.d(TAG, ":::mdoc-data-transfer::: TransferEvent.ResponseSent")
+                        sendEvent(
+                            MdocDataTransferEvent.ON_RESPONSE_SENT,
+                            null,
+                        )
+                    }
                 }
             }
-        }
 
         MdocDataTransferManager.transferManager.value.addTransferEventListener(transferEventListener)
     }

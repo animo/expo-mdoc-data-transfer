@@ -26,33 +26,37 @@ class MdocDataTransfer: RCTEventEmitter {
     return
   }
 
-    @objc func initialize(_ serviceName: String, trustedCertificates: Array<String>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        resolver = resolve
-        rejector = reject
-        
+  @objc func initialize(
+    _ serviceName: String, trustedCertificates: [String], resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    resolver = resolve
+    rejector = reject
+
     guard bleServerTransfer == nil else {
-        self.reject(MdocDataTransferError.BleGattServerAlreadyInitialized.localizedDescription)
-        return
+      self.reject(MdocDataTransferError.BleGattServerAlreadyInitialized.localizedDescription)
+      return
     }
-        
-    let decodedCertificates: Array<Data> = trustedCertificates.map { $0.data(using: .utf8) ?? Data() }.filter { !$0.isEmpty }
-        
-    var base64DecodedCerts: Array<Data> = Array()
+
+    let decodedCertificates: [Data] = trustedCertificates.map { $0.data(using: .utf8) ?? Data() }
+      .filter { !$0.isEmpty }
+
+    var base64DecodedCerts: [Data] = Array()
     for cert in decodedCertificates {
-        guard let base64Data = Data(base64Encoded: cert) else {
-            self.reject(MdocDataTransferError.InvalidTrustedCertificate.localizedDescription)
-            return
-        }
-        
-        let secCert = SecCertificateCreateWithData(nil, base64Data as CFData)
-        if secCert == nil {
-            self.reject(MdocDataTransferError.InvalidTrustedCertificate.localizedDescription)
-            return
-        }
-        
-        base64DecodedCerts.append(base64Data)
+      guard let base64Data = Data(base64Encoded: cert) else {
+        self.reject(MdocDataTransferError.InvalidTrustedCertificate.localizedDescription)
+        return
+      }
+
+      let secCert = SecCertificateCreateWithData(nil, base64Data as CFData)
+      if secCert == nil {
+        self.reject(MdocDataTransferError.InvalidTrustedCertificate.localizedDescription)
+        return
+      }
+
+      base64DecodedCerts.append(base64Data)
     }
-        
+
     secureArea = SoftwareSecureArea.create(
       storage: KeyChainSecureKeyStorage(serviceName: serviceName, accessGroup: nil))
 
@@ -71,8 +75,8 @@ class MdocDataTransfer: RCTEventEmitter {
       )
       bleServerTransfer?.delegate = self
     } catch {
-        self.reject(error.localizedDescription)
-        return
+      self.reject(error.localizedDescription)
+      return
     }
 
     self.resolve(nil)

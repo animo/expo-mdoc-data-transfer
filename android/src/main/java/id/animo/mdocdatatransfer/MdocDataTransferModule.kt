@@ -8,55 +8,57 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
 
 class MdocDataTransferModule : Module() {
-    override fun definition() = ModuleDefinition {
-        var mDocDataTransfer: MdocDataTransfer? = null
+    override fun definition() =
+        ModuleDefinition {
+            var mDocDataTransfer: MdocDataTransfer? = null
 
-        Name("MdocDataTransfer")
+            Name("MdocDataTransfer")
 
-        Events(
-            MdocDataTransferEvent.ON_REQUEST_RECEIVED,
-            MdocDataTransferEvent.ON_RESPONSE_SENT
-        )
+            Events(
+                MdocDataTransferEvent.ON_REQUEST_RECEIVED,
+                MdocDataTransferEvent.ON_RESPONSE_SENT,
+            )
 
-        Function("initialize") { serviceName: String ->
-            // We have to re-set the Bouncy Castle provider, otherwise the EUDI library cannot find it correctly
-            Security.removeProvider("BC")
-            Security.addProvider(BouncyCastleProvider())
+            Function("initialize") { serviceName: String, trustedCertificates: Array<String> ->
+                // We have to re-set the Bouncy Castle provider, otherwise the EUDI library cannot find it correctly
+                Security.removeProvider("BC")
+                Security.addProvider(BouncyCastleProvider())
 
-            mDocDataTransfer = MdocDataTransfer(
-                appContext.reactContext ?: throw Exceptions.ReactContextLost(),
-                appContext.currentActivity ?: throw Exceptions.MissingActivity()
-            ) { name: String, body: Map<String, Any?>? ->
-                sendEvent(
-                    name,
-                    body ?: mapOf()
+                mDocDataTransfer =
+                    MdocDataTransfer(
+                        appContext.reactContext ?: throw Exceptions.ReactContextLost(),
+                        appContext.currentActivity ?: throw Exceptions.MissingActivity(),
+                        trustedCertificates,
+                    ) { name: String, body: Map<String, Any?>? ->
+                        sendEvent(
+                            name,
+                            body ?: mapOf(),
+                        )
+                    }
+            }
+
+            AsyncFunction("startQrEngagement") { promise: Promise ->
+                mDocDataTransfer?.apply {
+                    onQrEngagementReady = { qrCode ->
+                        promise.resolve(qrCode)
+                        onQrEngagementReady = null
+                    }
+                    startQrEngagement()
+                } ?: throw MdocDataTransferException.NotInitialized()
+            }
+
+            Function("sendDeviceResponse") { deviceResponse: String ->
+                (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).respond(
+                    deviceResponse.split(":").map { it.toUInt().toByte() }.toByteArray(),
                 )
             }
-        }
 
+            Function("shutdown") {
+                (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).shutdown()
+            }
 
-        AsyncFunction("startQrEngagement") { promise: Promise ->
-            mDocDataTransfer?.apply {
-                onQrEngagementReady = { qrCode ->
-                    promise.resolve(qrCode)
-                    onQrEngagementReady = null
-                }
-                startQrEngagement()
-            } ?: throw MdocDataTransferException.NotInitialized()
+            Function("enableNfc") {
+                (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).enableNfc()
+            }
         }
-
-        Function("sendDeviceResponse") { deviceResponse: String ->
-            (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).respond(
-                deviceResponse.split(":").map { it.toUInt().toByte() }.toByteArray()
-            )
-        }
-
-        Function("shutdown") {
-            (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).shutdown()
-        }
-
-        Function("enableNfc") {
-            (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).enableNfc()
-        }
-    }
 }
