@@ -9,8 +9,7 @@ export let instance: MdocDataTransfer | undefined = undefined
 export const mdocDataTransfer = {
   instance: async (serviceName: string, trustedCertificates: Array<string> = []) => {
     if (instance) return instance
-    const i = await MdocDataTransfer.initialize(serviceName, trustedCertificates)
-    return i
+    return await MdocDataTransfer.initialize(serviceName, trustedCertificates)
   },
 }
 

@@ -17,7 +17,11 @@ type MdocDataTransferModuleWithEvents = NativeEventEmitter & MdocDataTransferMod
 
 export const requireExpoModule = () => requireNativeModule<MdocDataTransferModuleWithEvents>('MdocDataTransfer')
 
-export const requireReactNativeModule = () =>
-  new NativeEventEmitter(
-    ReactNativeNativeModules.MdocDataTransfer as ReactNativeNativeModule
-  ) as MdocDataTransferModuleWithEvents
+export const requireReactNativeModule = () => {
+  const nativeModule = ReactNativeNativeModules.MdocDataTransfer as ReactNativeNativeModule
+
+  return {
+    ...new NativeEventEmitter(nativeModule),
+    ...nativeModule,
+  } as unknown as MdocDataTransferModuleWithEvents
+}
