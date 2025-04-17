@@ -3,7 +3,7 @@ import {
   type OnRequestReceivedEventPayload,
   type OnResponseSendPayload,
 } from './MdocDataTransferEvent'
-import { mDocNativeModule, mDocNativeModuleEventEmitter } from './MdocDataTransferModule'
+import { mDocNativeModule } from './MdocDataTransferModule'
 
 export let instance: MdocDataTransfer | undefined = undefined
 export const mdocDataTransfer = {
@@ -29,12 +29,12 @@ class MdocDataTransfer {
 
   public async waitForDeviceRequest() {
     return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>((resolve) =>
-      mDocNativeModuleEventEmitter.addListener(
+      mDocNativeModule.addListener(
         MdocDataTransferEvent.OnRequestReceived,
         (payload: OnRequestReceivedEventPayload) => {
           resolve({
-            deviceRequest: new Uint8Array(payload.deviceRequest),
-            sessionTranscript: new Uint8Array(payload.sessionTranscript),
+            deviceRequest: new Uint8Array(payload.deviceRequest.split(':').map(Number)),
+            sessionTranscript: new Uint8Array(payload.sessionTranscript.split(':').map(Number)),
           })
         }
       )
@@ -43,7 +43,7 @@ class MdocDataTransfer {
 
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
     const p = new Promise<OnResponseSendPayload>((resolve) =>
-      mDocNativeModuleEventEmitter.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
+      mDocNativeModule.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
     )
 
     mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))

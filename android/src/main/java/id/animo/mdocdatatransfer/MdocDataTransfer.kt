@@ -56,8 +56,8 @@ class MdocDataTransfer(
                         sendEvent(
                             MdocDataTransferEvent.ON_REQUEST_RECEIVED,
                             mapOf(
-                                "deviceRequest" to request.deviceRequestBytes.asList(),
-                                "sessionTranscript" to request.sessionTranscriptBytes.asList(),
+                                "deviceRequest" to request.deviceRequestBytes.joinToString(":"),
+                                "sessionTranscript" to request.sessionTranscriptBytes.joinToString(":"),
                             ),
                         )
                     }
