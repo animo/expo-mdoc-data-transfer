@@ -7,7 +7,7 @@ import {
 
 export interface MdocDataTransferModule {
   enableNfc: () => void
-  initialize: (serviceName: string, trustedCertificates: Array<string>) => Promise<void>
+  initialize: (serviceName: string) => Promise<void>
   startQrEngagement: () => Promise<string>
   sendDeviceResponse: (devceResponse: string) => Promise<void>
   shutdown: () => undefined

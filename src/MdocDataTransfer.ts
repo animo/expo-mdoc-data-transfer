@@ -7,17 +7,17 @@ import { mDocNativeModule } from './MdocDataTransferModule'
 
 export let instance: MdocDataTransfer | undefined = undefined
 export const mdocDataTransfer = {
-  instance: async (serviceName: string, trustedCertificates: Array<string> = []) => {
+  instance: async (serviceName: string) => {
     if (instance) return instance
-    return await MdocDataTransfer.initialize(serviceName, trustedCertificates)
+    return await MdocDataTransfer.initialize(serviceName)
   },
 }
 
 class MdocDataTransfer {
   public isNfcEnabled = false
 
-  public static async initialize(serviceName: string, trustedCertificates: Array<string> = []) {
-    await mDocNativeModule.initialize(serviceName, trustedCertificates)
+  public static async initialize(serviceName: string) {
+    await mDocNativeModule.initialize(serviceName)
     instance = new MdocDataTransfer()
     return instance
   }

@@ -12,7 +12,6 @@ import eu.europa.ec.eudi.iso18013.transfer.response.device.DeviceResponse
 class MdocDataTransfer(
     context: Context,
     private val currentActivity: Activity,
-    trustedCertificates: Array<String>,
     sendEvent: (name: String, body: Map<String, Any?>?) -> Unit,
 ) {
     companion object {
@@ -20,7 +19,7 @@ class MdocDataTransfer(
     }
 
     init {
-        MdocDataTransferManager.init(context, trustedCertificates)
+        MdocDataTransferManager.init(context)
 
         val transferEventListener =
             TransferEvent.Listener { event ->
