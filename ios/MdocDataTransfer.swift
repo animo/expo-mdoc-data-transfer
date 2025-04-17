@@ -26,9 +26,16 @@ class MdocDataTransfer: RCTEventEmitter {
     return
   }
 
-  @objc func initialize(_ serviceName: String) -> String? {
+  @objc func initialize(
+    _ serviceName: String, resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    resolver = resolve
+    rejector = reject
+
     guard bleServerTransfer == nil else {
-      return MdocDataTransferError.BleGattServerAlreadyInitialized.localizedDescription
+      self.reject(MdocDataTransferError.BleGattServerAlreadyInitialized.localizedDescription)
+      return
     }
 
     secureArea = SoftwareSecureArea.create(
@@ -49,10 +56,11 @@ class MdocDataTransfer: RCTEventEmitter {
       )
       bleServerTransfer?.delegate = self
     } catch {
-      return error.localizedDescription
+      self.reject(error.localizedDescription)
+      return
     }
 
-    return nil
+    self.resolve(nil)
   }
 
   @objc func startQrEngagement(

@@ -19,11 +19,18 @@ const requestPermissions = async () => PermissionsAndroid.requestMultiple(PERMIS
 
 export const App = () => {
   const [qrCode, setQrCode] = useState<string>()
-  const [mdt, setMdt] = useState<ReturnType<typeof mdocDataTransfer.instance>>()
+  const [mdt, setMdt] = useState<Awaited<ReturnType<typeof mdocDataTransfer.instance>>>()
 
   useMdocDataTransferShutdownOnUnmount()
 
-  const start = () => setMdt(mdocDataTransfer.instance('ma_service'))
+  const start = async () => {
+    try {
+      const m = await mdocDataTransfer.instance('ma_service')
+      setMdt(m)
+    } catch (e) {
+      console.error(e)
+    }
+  }
   const enableNfc = () => mdt?.enableNfc()
   const engagement = async () => {
     const qr = await mdt?.startQrEngagement()

@@ -3,26 +3,21 @@ import {
   type OnRequestReceivedEventPayload,
   type OnResponseSendPayload,
 } from './MdocDataTransferEvent'
-import { mDocNativeModule, mDocNativeModuleEventEmitter } from './MdocDataTransferModule'
+import { mDocNativeModule } from './MdocDataTransferModule'
 
 export let instance: MdocDataTransfer | undefined = undefined
 export const mdocDataTransfer = {
-  instance: (serviceName: string) => {
+  instance: async (serviceName: string) => {
     if (instance) return instance
-    return MdocDataTransfer.initialize(serviceName)
+    return await MdocDataTransfer.initialize(serviceName)
   },
 }
 
 class MdocDataTransfer {
   public isNfcEnabled = false
 
-  public static initialize(serviceName: string) {
-    const error = mDocNativeModule.initialize(serviceName)
-
-    if (typeof error === 'string' && error.length > 0) {
-      throw new Error(error)
-    }
-
+  public static async initialize(serviceName: string) {
+    await mDocNativeModule.initialize(serviceName)
     instance = new MdocDataTransfer()
     return instance
   }
@@ -33,12 +28,12 @@ class MdocDataTransfer {
 
   public async waitForDeviceRequest() {
     return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>((resolve) =>
-      mDocNativeModuleEventEmitter.addListener(
+      mDocNativeModule.addListener(
         MdocDataTransferEvent.OnRequestReceived,
         (payload: OnRequestReceivedEventPayload) => {
           resolve({
-            deviceRequest: new Uint8Array(payload.deviceRequest),
-            sessionTranscript: new Uint8Array(payload.sessionTranscript),
+            deviceRequest: new Uint8Array(payload.deviceRequest.split(':').map(Number)),
+            sessionTranscript: new Uint8Array(payload.sessionTranscript.split(':').map(Number)),
           })
         }
       )
@@ -47,7 +42,7 @@ class MdocDataTransfer {
 
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
     const p = new Promise<OnResponseSendPayload>((resolve) =>
-      mDocNativeModuleEventEmitter.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
+      mDocNativeModule.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
     )
 
     mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))
@@ -57,12 +52,7 @@ class MdocDataTransfer {
 
   public shutdown() {
     this.isNfcEnabled = false
-    const error = mDocNativeModule.shutdown()
-
-    if (typeof error === 'string' && error.length > 0) {
-      throw new Error(error)
-    }
-
+    mDocNativeModule.shutdown()
     instance = undefined
   }
 
