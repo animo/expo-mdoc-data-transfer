@@ -25,10 +25,6 @@ class MdocDataTransfer: RCTEventEmitter {
 
     @objc
     func initialize() -> String? {
-        guard bleServerTransfer == nil else {
-            return MdocDataTransferError.BleGattServerAlreadyInitialized.localizedDescription
-        }
-
         do {
             bleServerTransfer = try MdocGattServer(parameters: [
                 InitializeKeys.document_json_data.rawValue: [],
