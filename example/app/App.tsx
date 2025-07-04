@@ -35,11 +35,11 @@ export const App = () => {
   const engagement = async () => {
     const qr = await mdt?.startQrEngagement()
     setQrCode(qr)
+    await mdt?.waitForDeviceRequest()
   }
 
   const sendDeviceResponse = async () => {
     await mdt?.sendDeviceResponse(new Uint8Array([1, 2, 3]))
-    await mdt?.waitForDeviceRequest()
   }
 
   const shutdown = () => {

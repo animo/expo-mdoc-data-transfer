@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import {
   MdocDataTransferEvent,
   type OnRequestReceivedEventPayload,
@@ -17,23 +18,23 @@ class MdocDataTransfer {
   public isNfcEnabled = false
 
   public static async initialize(serviceName: string) {
-    await mDocNativeModule.initialize(serviceName)
+    await mDocNativeModule.nativeModule.initialize(serviceName)
     instance = new MdocDataTransfer()
     return instance
   }
 
   public async startQrEngagement() {
-    return await mDocNativeModule.startQrEngagement()
+    return await mDocNativeModule.nativeModule.startQrEngagement()
   }
 
   public async waitForDeviceRequest() {
     return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>((resolve) =>
-      mDocNativeModule.addListener(
+      mDocNativeModule.eventEmitter.addListener(
         MdocDataTransferEvent.OnRequestReceived,
         (payload: OnRequestReceivedEventPayload) => {
           resolve({
-            deviceRequest: new Uint8Array(payload.deviceRequest.split(':').map(Number)),
-            sessionTranscript: new Uint8Array(payload.sessionTranscript.split(':').map(Number)),
+            deviceRequest: new Uint8Array(Buffer.from(payload.deviceRequest, 'base64')),
+            sessionTranscript: new Uint8Array(Buffer.from(payload.sessionTranscript, 'base64')),
           })
         }
       )
@@ -42,23 +43,23 @@ class MdocDataTransfer {
 
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
     const p = new Promise<OnResponseSendPayload>((resolve) =>
-      mDocNativeModule.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
+      mDocNativeModule.eventEmitter.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
     )
 
-    mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))
+    mDocNativeModule.nativeModule.sendDeviceResponse(Buffer.from(deviceResponse).toString('base64'))
 
     await p
   }
 
   public shutdown() {
     this.isNfcEnabled = false
-    mDocNativeModule.shutdown()
+    mDocNativeModule.nativeModule.shutdown()
     instance = undefined
   }
 
   public enableNfc() {
     if (this.isNfcEnabled) return
-    mDocNativeModule.enableNfc()
+    mDocNativeModule.nativeModule.enableNfc()
     this.isNfcEnabled = true
   }
 }

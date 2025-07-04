@@ -8,7 +8,11 @@ import eu.europa.ec.eudi.iso18013.transfer.TransferEvent
 import eu.europa.ec.eudi.iso18013.transfer.engagement.NfcEngagementService
 import eu.europa.ec.eudi.iso18013.transfer.response.device.DeviceRequest
 import eu.europa.ec.eudi.iso18013.transfer.response.device.DeviceResponse
+import org.bouncycastle.jcajce.provider.symmetric.ARC4.Base
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
+@OptIn(ExperimentalEncodingApi::class)
 class MdocDataTransfer(
     context: Context,
     private val currentActivity: Activity,
@@ -55,8 +59,8 @@ class MdocDataTransfer(
                         sendEvent(
                             MdocDataTransferEvent.ON_REQUEST_RECEIVED,
                             mapOf(
-                                "deviceRequest" to request.deviceRequestBytes.joinToString(":"),
-                                "sessionTranscript" to request.sessionTranscriptBytes.joinToString(":"),
+                                "deviceRequest" to  Base64.Default.encode(request.deviceRequestBytes),
+                                "sessionTranscript" to Base64.Default.encode(request.sessionTranscriptBytes),
                             ),
                         )
                     }

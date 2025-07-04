@@ -1,6 +1,6 @@
-import { requireNativeModule } from 'expo-modules-core'
+import { requireNativeModule, EventEmitter as ExpoEventEmitter } from 'expo-modules-core'
 import {
-  NativeEventEmitter,
+  NativeEventEmitter as ReactNativeEventEmitter,
   type NativeModule as ReactNativeNativeModule,
   NativeModules as ReactNativeNativeModules,
 } from 'react-native'
@@ -13,15 +13,28 @@ export interface MdocDataTransferModule {
   shutdown: () => undefined
 }
 
-type MdocDataTransferModuleWithEvents = NativeEventEmitter & MdocDataTransferModule
+type MdocDataTransferModuleWithEvents = {
+  nativeModule: MdocDataTransferModule,
+  eventEmitter: ReactNativeEventEmitter
+}
 
-export const requireExpoModule = () => requireNativeModule<MdocDataTransferModuleWithEvents>('MdocDataTransfer')
+export const requireExpoModule = () => { 
+  const nativeModule = requireNativeModule('MdocDataTransfer')
+
+
+  return {
+    nativeModule,
+    eventEmitter: nativeModule
+  } as unknown as MdocDataTransferModuleWithEvents
+}
 
 export const requireReactNativeModule = () => {
   const nativeModule = ReactNativeNativeModules.MdocDataTransfer as ReactNativeNativeModule
 
+  const eventEmitter = new ReactNativeEventEmitter(nativeModule)
+
   return {
-    ...new NativeEventEmitter(nativeModule),
-    ...nativeModule,
+    nativeModule,
+    eventEmitter
   } as unknown as MdocDataTransferModuleWithEvents
 }

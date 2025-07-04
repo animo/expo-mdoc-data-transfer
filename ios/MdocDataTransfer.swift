@@ -18,7 +18,7 @@ class MdocDataTransfer: RCTEventEmitter {
   var rejector: RCTPromiseRejectBlock?
 
   override func supportedEvents() -> [String]! {
-    return ["onResponseSent", "onRequestReceived"]
+    return [ON_RESPONSE_SENT_EVENT, ON_REQUEST_RECEIVED_EVENT]
   }
 
   // NFC is not enabled on iOS
@@ -105,9 +105,13 @@ class MdocDataTransfer: RCTEventEmitter {
       }
 
       do {
-        let byteArray = deviceResponse.split(separator: ":").compactMap {
-          UInt8($0)
-        }
+        let byteArray = Data(base64Encoded: deviceResponse)?.bytes
+          
+          guard let byteArray = byteArray else {
+              self.reject(MdocDataTransferError.InvalidEncoding.localizedDescription)
+              return
+          }
+        
         let cipherData = try await sessionEncryption.encrypt(byteArray)
         let sd = SessionData(cipher_data: cipherData, status: 20)
         try bleServerTransfer.sendDeviceResponse(
@@ -222,8 +226,8 @@ extension MdocDataTransfer: MdocOfflineDelegate {
     sendEvent(
       withName: ON_REQUEST_RECEIVED_EVENT,
       body: [
-        "sessionTranscript": sessionTranscriptBytes,
-        "deviceRequest": deviceRequestBytes,
+        "sessionTranscript": Data(sessionTranscriptBytes).base64EncodedString(),
+        "deviceRequest": Data(deviceRequestBytes).base64EncodedString(),
       ])
   }
 }

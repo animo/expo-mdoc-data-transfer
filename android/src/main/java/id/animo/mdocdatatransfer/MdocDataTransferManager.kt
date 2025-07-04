@@ -14,8 +14,7 @@ object MdocDataTransferManager {
     private lateinit var context: Context
 
     fun init(
-        context: Context,
-        tc: Array<String>,
+        context: Context
     ) {
         this.context = context
     }
