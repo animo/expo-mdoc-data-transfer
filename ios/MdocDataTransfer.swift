@@ -73,7 +73,7 @@ class MdocDataTransfer: RCTEventEmitter {
         do {
             let byteArray = Data(base64Encoded: deviceResponse.data(using: .utf8)!)!
             
-            let cipherData = try sessionEncryption.encrypt(byteArray)
+            let cipherData = try sessionEncryption.encrypt([UInt8](byteArray))
             let sd = SessionData(cipher_data: cipherData, status: 20)
             try bleServerTransfer.sendResponse(
                 Data(sd.encode(options: CBOROptions())))
