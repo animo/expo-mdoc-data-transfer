@@ -71,9 +71,8 @@ class MdocDataTransfer: RCTEventEmitter {
         }
 
         do {
-            let byteArray = deviceResponse.split(separator: ":").compactMap {
-                UInt8($0)
-            }
+            let byteArray = Data(base64Encoded: deviceResponse.data(using: .utf8)!)!
+            
             let cipherData = try sessionEncryption.encrypt(byteArray)
             let sd = SessionData(cipher_data: cipherData, status: 20)
             try bleServerTransfer.sendResponse(
@@ -188,8 +187,8 @@ extension MdocDataTransfer: MdocOfflineDelegate {
         sendEvent(
             withName: ON_REQUEST_RECEIVED_EVENT,
             body: [
-                "sessionTranscript": sessionTranscriptBytes,
-                "deviceRequest": deviceRequestBytes,
+                "sessionTranscript": Data(sessionTranscriptBytes).base64EncodedString(),
+                "deviceRequest": Data(deviceRequestBytes).base64EncodedString(),
             ])
     }
 }

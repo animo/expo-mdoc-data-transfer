@@ -6,8 +6,11 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class MdocDataTransferModule : Module() {
+    @OptIn(ExperimentalEncodingApi::class)
     override fun definition() = ModuleDefinition {
         var mDocDataTransfer: MdocDataTransfer? = null
 
@@ -49,7 +52,7 @@ class MdocDataTransferModule : Module() {
 
         Function("sendDeviceResponse") { deviceResponse: String ->
             (mDocDataTransfer ?: throw MdocDataTransferException.NotInitialized()).respond(
-                deviceResponse.split(":").map { it.toUInt().toByte() }.toByteArray()
+                Base64.Default.decode(deviceResponse)
             )
         }
 

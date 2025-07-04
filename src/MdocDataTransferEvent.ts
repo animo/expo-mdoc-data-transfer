@@ -5,7 +5,7 @@ export enum MdocDataTransferEvent {
 
 export type OnResponseSendPayload = null
 
-export type OnRequestReceivedEventPayload<T = Array<number>> = {
+export type OnRequestReceivedEventPayload<T = string> = {
   deviceRequest: T
   sessionTranscript: T
 }

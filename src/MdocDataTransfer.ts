@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import {
   MdocDataTransferEvent,
   type OnRequestReceivedEventPayload,
@@ -37,8 +38,8 @@ class MdocDataTransfer {
         MdocDataTransferEvent.OnRequestReceived,
         (payload: OnRequestReceivedEventPayload) => {
           resolve({
-            deviceRequest: new Uint8Array(payload.deviceRequest),
-            sessionTranscript: new Uint8Array(payload.sessionTranscript),
+            deviceRequest: new Uint8Array(Buffer.from(payload.deviceRequest, 'base64')),
+            sessionTranscript: new Uint8Array(Buffer.from(payload.sessionTranscript, 'base64')),
           })
         }
       )
@@ -50,7 +51,7 @@ class MdocDataTransfer {
       mDocNativeModuleEventEmitter.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
     )
 
-    mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))
+    mDocNativeModule.sendDeviceResponse(Buffer.from(deviceResponse).toString('base64'))
 
     await p
   }

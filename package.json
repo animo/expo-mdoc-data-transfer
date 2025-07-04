@@ -35,10 +35,11 @@
   },
   "peerDependencies": {
     "expo": ">= 51",
-    "react-native": ">= 0.75",
-    "react": "*"
+    "react": "*",
+    "react-native": ">= 0.75"
   },
   "dependencies": {
-    "@expo/config-plugins": "^8.0.10"
+    "@expo/config-plugins": "^8.0.10",
+    "buffer": "^6.0.3"
   }
 }
