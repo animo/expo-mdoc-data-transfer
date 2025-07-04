@@ -13,32 +13,36 @@ object MdocDataTransferManager {
     @Volatile
     private lateinit var context: Context
 
-    fun init(context: Context) {
+    fun init(
+        context: Context
+    ) {
         this.context = context
     }
 
     private val storageEngine = EphemeralStorageEngine()
     private val secureArea = SoftwareSecureArea(storageEngine)
 
-    private val documentManager = DocumentManager
-        .Builder()
-        .setIdentifier("eudi_wallet_document_manager")
-        .setStorageEngine(storageEngine)
-        .addSecureArea(secureArea)
-        .build()
+    private val documentManager =
+        DocumentManager
+            .Builder()
+            .setIdentifier("eudi_wallet_document_manager")
+            .setStorageEngine(storageEngine)
+            .addSecureArea(secureArea)
+            .build()
 
-    val transferManager = lazy {
-        TransferManager.getDefault(
-            context,
-            documentManager,
-            null,
-            listOf(
-                BleRetrievalMethod(
-                    peripheralServerMode = true,
-                    centralClientMode = true,
-                    clearBleCache = true
-                )
+    val transferManager =
+        lazy {
+            TransferManager.getDefault(
+                context,
+                documentManager,
+                null,
+                listOf(
+                    BleRetrievalMethod(
+                        peripheralServerMode = true,
+                        centralClientMode = true,
+                        clearBleCache = true,
+                    ),
+                ),
             )
-        )
-    }
+        }
 }

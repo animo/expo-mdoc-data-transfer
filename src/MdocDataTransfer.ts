@@ -1,44 +1,40 @@
+import { Buffer } from 'buffer'
 import {
   MdocDataTransferEvent,
   type OnRequestReceivedEventPayload,
   type OnResponseSendPayload,
 } from './MdocDataTransferEvent'
-import { mDocNativeModule, mDocNativeModuleEventEmitter } from './MdocDataTransferModule'
+import { mDocNativeModule } from './MdocDataTransferModule'
 
 export let instance: MdocDataTransfer | undefined = undefined
 export const mdocDataTransfer = {
-  instance: (serviceName: string) => {
+  instance: async (serviceName: string) => {
     if (instance) return instance
-    return MdocDataTransfer.initialize(serviceName)
+    return await MdocDataTransfer.initialize(serviceName)
   },
 }
 
 class MdocDataTransfer {
   public isNfcEnabled = false
 
-  public static initialize(serviceName: string) {
-    const error = mDocNativeModule.initialize(serviceName)
-
-    if (typeof error === 'string' && error.length > 0) {
-      throw new Error(error)
-    }
-
+  public static async initialize(serviceName: string) {
+    await mDocNativeModule.nativeModule.initialize(serviceName)
     instance = new MdocDataTransfer()
     return instance
   }
 
   public async startQrEngagement() {
-    return await mDocNativeModule.startQrEngagement()
+    return await mDocNativeModule.nativeModule.startQrEngagement()
   }
 
   public async waitForDeviceRequest() {
     return await new Promise<OnRequestReceivedEventPayload<Uint8Array>>((resolve) =>
-      mDocNativeModuleEventEmitter.addListener(
+      mDocNativeModule.eventEmitter.addListener(
         MdocDataTransferEvent.OnRequestReceived,
         (payload: OnRequestReceivedEventPayload) => {
           resolve({
-            deviceRequest: new Uint8Array(payload.deviceRequest),
-            sessionTranscript: new Uint8Array(payload.sessionTranscript),
+            deviceRequest: new Uint8Array(Buffer.from(payload.deviceRequest, 'base64')),
+            sessionTranscript: new Uint8Array(Buffer.from(payload.sessionTranscript, 'base64')),
           })
         }
       )
@@ -47,28 +43,23 @@ class MdocDataTransfer {
 
   public async sendDeviceResponse(deviceResponse: Uint8Array) {
     const p = new Promise<OnResponseSendPayload>((resolve) =>
-      mDocNativeModuleEventEmitter.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
+      mDocNativeModule.eventEmitter.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
     )
 
-    mDocNativeModule.sendDeviceResponse(deviceResponse.join(':'))
+    mDocNativeModule.nativeModule.sendDeviceResponse(Buffer.from(deviceResponse).toString('base64'))
 
     await p
   }
 
   public shutdown() {
     this.isNfcEnabled = false
-    const error = mDocNativeModule.shutdown()
-
-    if (typeof error === 'string' && error.length > 0) {
-      throw new Error(error)
-    }
-
+    mDocNativeModule.nativeModule.shutdown()
     instance = undefined
   }
 
   public enableNfc() {
     if (this.isNfcEnabled) return
-    mDocNativeModule.enableNfc()
+    mDocNativeModule.nativeModule.enableNfc()
     this.isNfcEnabled = true
   }
 }
