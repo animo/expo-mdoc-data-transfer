@@ -1,6 +1,8 @@
 import { Buffer } from 'buffer'
+import { MdocDataTransferError } from './MdocDataTransferError'
 import {
   MdocDataTransferEvent,
+  type OnErrorPayload,
   type OnRequestReceivedEventPayload,
   type OnResponseSendPayload,
 } from './MdocDataTransferEvent'
@@ -12,17 +14,32 @@ export const mdocDataTransfer = {
     if (instance) return instance
     return MdocDataTransfer.initialize()
   },
+  isInitialized: () => !!instance,
 }
 
 class MdocDataTransfer {
   public isNfcEnabled = false
 
-  public static initialize() {
-    const error = mDocNativeModule.initialize()
+  private static handleError(nativeCall: () => void) {
+    let error: string | undefined
+    const subscription = mDocNativeModuleEventEmitter.addListener(
+      MdocDataTransferEvent.OnError,
+      (payload: OnErrorPayload) => {
+        error = payload.error
+      }
+    )
 
-    if (typeof error === 'string' && error.length > 0) {
-      throw new Error(error)
+    nativeCall()
+
+    subscription.remove()
+
+    if (error) {
+      throw new MdocDataTransferError(error)
     }
+  }
+
+  public static initialize() {
+    MdocDataTransfer.handleError(mDocNativeModule.initialize)
 
     instance = new MdocDataTransfer()
     return instance
@@ -51,18 +68,16 @@ class MdocDataTransfer {
       mDocNativeModuleEventEmitter.addListener(MdocDataTransferEvent.OnResponseSent, resolve)
     )
 
-    mDocNativeModule.sendDeviceResponse(Buffer.from(deviceResponse).toString('base64'))
+    MdocDataTransfer.handleError(() =>
+      mDocNativeModule.sendDeviceResponse(Buffer.from(deviceResponse).toString('base64'))
+    )
 
     await p
   }
 
   public shutdown() {
     this.isNfcEnabled = false
-    const error = mDocNativeModule.shutdown()
-
-    if (typeof error === 'string' && error.length > 0) {
-      throw new Error(error)
-    }
+    MdocDataTransfer.handleError(mDocNativeModule.shutdown)
 
     instance = undefined
   }
