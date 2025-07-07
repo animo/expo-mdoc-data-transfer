@@ -8,13 +8,14 @@ import SwiftCBOR
 class MdocDataTransfer: RCTEventEmitter {
     let ON_RESPONSE_SENT_EVENT: String = "onResponseSent"
     let ON_REQUEST_RECEIVED_EVENT: String = "onRequestReceived"
+    let ON_ERROR_EVENT: String = "onError"
 
     var bleServerTransfer: MdocGattServer?
     var resolver: RCTPromiseResolveBlock?
     var rejector: RCTPromiseRejectBlock?
 
     override func supportedEvents() -> [String]! {
-        return ["onResponseSent", "onRequestReceived"]
+        return [ON_RESPONSE_SENT_EVENT, ON_REQUEST_RECEIVED_EVENT, ON_ERROR_EVENT]
     }
 
     // NFC is not enabled on iOS
@@ -24,7 +25,7 @@ class MdocDataTransfer: RCTEventEmitter {
     }
 
     @objc
-    func initialize() -> String? {
+    func initialize() {
         do {
             bleServerTransfer = try MdocGattServer(parameters: [
                 InitializeKeys.document_json_data.rawValue: [],
@@ -33,10 +34,8 @@ class MdocDataTransfer: RCTEventEmitter {
             ])
             bleServerTransfer?.delegate = self
         } catch {
-            return error.localizedDescription
+            sendEvent(withName: ON_ERROR_EVENT, body: ["error": error.localizedDescription])
         }
-
-        return nil
     }
 
     @objc(startQrEngagement:_:)
@@ -58,12 +57,12 @@ class MdocDataTransfer: RCTEventEmitter {
     }
 
     @objc(sendDeviceResponse:)
-    func sendDeviceResponse(deviceResponse: String) -> String? {
+    func sendDeviceResponse(deviceResponse: String) {
         guard let bleServerTransfer = bleServerTransfer,
             var sessionEncryption = bleServerTransfer.sessionEncryption
         else {
-            return MdocDataTransferError.BleGattServerNotInitialized
-                .localizedDescription
+            sendEvent(withName: ON_ERROR_EVENT, body: ["error": MdocDataTransferError.BleGattServerNotInitialized.localizedDescription])
+            return
         }
 
         do {
@@ -79,19 +78,18 @@ class MdocDataTransfer: RCTEventEmitter {
                 try bleServerTransfer.sendResponse(
                     Data(sd.encode(options: CBOROptions())))
             } catch {
-                return error.localizedDescription
+                sendEvent(withName: ON_ERROR_EVENT, body:  ["error": error.localizedDescription])
+                return
             }
-            return error.localizedDescription
+            sendEvent(withName: ON_ERROR_EVENT, body:  ["error": error.localizedDescription])
         }
-
-        return nil
     }
 
     @objc
-    func shutdown() -> String? {
+    func shutdown() {
         guard let bleServerTransfer = bleServerTransfer else {
-            return MdocDataTransferError.BleGattServerNotInitialized
-                .localizedDescription
+            sendEvent(withName: ON_ERROR_EVENT, body: ["error": MdocDataTransferError.BleGattServerNotInitialized.localizedDescription])
+            return
 
         }
 
@@ -100,8 +98,6 @@ class MdocDataTransfer: RCTEventEmitter {
         self.bleServerTransfer = nil
         rejector = nil
         resolver = nil
-
-        return nil
     }
 
     private func reject(_ message: String) {
@@ -163,7 +159,7 @@ extension MdocDataTransfer: MdocOfflineDelegate {
     }
 
     public func didFinishedWithError(_ error: any Error) {
-        reject(error.localizedDescription)
+        sendEvent(withName: ON_ERROR_EVENT, body: ["error": error.localizedDescription])
     }
 
     public func didReceiveRequest(
