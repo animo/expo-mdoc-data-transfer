@@ -25,7 +25,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.3",
     "@expo/config-types": "^54.0.8",
-    "@types/node": "^22.8.1",
+    "@types/node": "^24.10.0",
     "@types/react": "~18.2.79",
     "expo-module-scripts": "3.5.2",
     "expo-modules-core": "~1.12.26",
