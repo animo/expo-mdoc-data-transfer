@@ -25,8 +25,8 @@ importers:
         specifier: 1.9.3
         version: 1.9.3
       '@expo/config-types':
-        specifier: ^51.0.3
-        version: 51.0.3
+        specifier: ^54.0.8
+        version: 54.0.8
       '@types/node':
         specifier: ^22.8.1
         version: 22.10.7
@@ -972,6 +972,9 @@ packages:
 
   '@expo/config-types@52.0.3':
     resolution: {integrity: sha512-muxvuARmbysH5OGaiBRlh1Y6vfdmL56JtpXxB+y2Hfhu0ezG1U4FjZYBIacthckZPvnDCcP3xIu1R+eTo7/QFA==}
+
+  '@expo/config-types@54.0.8':
+    resolution: {integrity: sha512-lyIn/x/Yz0SgHL7IGWtgTLg6TJWC9vL7489++0hzCHZ4iGjVcfZmPTUfiragZ3HycFFj899qN0jlhl49IHa94A==}
 
   '@expo/config@10.0.8':
     resolution: {integrity: sha512-RaKwi8e6PbkMilRexdsxObLMdQwxhY6mlgel+l/eW+IfIw8HEydSU0ERlzYUjlGJxHLHUXe4rC2vw8FEvaowyQ==}
@@ -6980,6 +6983,8 @@ snapshots:
   '@expo/config-types@51.0.3': {}
 
   '@expo/config-types@52.0.3': {}
+
+  '@expo/config-types@54.0.8': {}
 
   '@expo/config@10.0.8':
     dependencies:
