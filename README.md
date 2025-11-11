@@ -1,41 +1,85 @@
-# @animo-id/mdoc-data-transfer
+<p align="center">
+  <picture>
+   <source media="(prefers-color-scheme: light)" srcset="https://res.cloudinary.com/animo-solutions/image/upload/v1656578320/animo-logo-light-no-text_ok9auy.svg">
+   <source media="(prefers-color-scheme: dark)" srcset="https://res.cloudinary.com/animo-solutions/image/upload/v1656578320/animo-logo-dark-no-text_fqqdq9.svg">
+   <img alt="Animo Logo" height="200px" />
+  </picture>
+</p>
 
-mdoc data transfer module
+<h1 align="center" ><b>Expo - mDOC Data Transfer</b></h1>
 
-# API documentation
+<h4 align="center">Powered by &nbsp; 
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="https://res.cloudinary.com/animo-solutions/image/upload/v1656579715/animo-logo-light-text_cma2yo.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="https://res.cloudinary.com/animo-solutions/image/upload/v1656579715/animo-logo-dark-text_uccvqa.svg">
+    <img alt="Animo Logo" height="12px" />
+  </picture>
+</h4><br>
 
-- [Documentation for the main branch](https://github.com/expo/expo/blob/main/docs/pages/versions/unversioned/sdk/@animo-id/expo-mdoc-data-transfer.md)
-- [Documentation for the latest stable release](https://docs.expo.dev/versions/latest/sdk/@animo-id/expo-mdoc-data-transfer/)
+<p align="center">
+  <a href="https://typescriptlang.org">
+    <img src="https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg" />
+  </a>
+  <a href="https://www.npmjs.com/package/@animo-id/expo-mdoc-data-transfer">
+    <img src="https://img.shields.io/npm/v/@animo-id/expo-mdoc-data-transfer" />
+  </a>
+  <a
+    href="https://raw.githubusercontent.com/animo/expo-mdoc-data-transfer/main/LICENSE"
+    ><img
+      alt="License"
+      src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"
+  /></a>
+</p>
 
-# Installation in managed Expo projects
+<p align="center">
+  <a href="#getting-started">Getting Started</a> 
+  &nbsp;|&nbsp;
+  <a href="#usage">Usage</a> 
+  &nbsp;|&nbsp;
+  <a href="#contributing">Contributing</a> 
+  &nbsp;|&nbsp;
+  <a href="#contributing">License</a> 
+</p>
 
-For [managed](https://docs.expo.dev/archive/managed-vs-bare/) Expo projects, please follow the installation instructions in the [API documentation for the latest stable release](#api-documentation). If you follow the link and there is no documentation available then this library is not yet usable within managed projects &mdash; it is likely to be included in an upcoming Expo SDK release.
+---
 
-TODO: plugin config for iOS and android:
+An [Expo Module](https://docs.expo.dev/modules/overview/) with support for mDOC (e.g., mDL) data transfer, as specified in ISO/IEC 18013-5.
 
-- iOS
-  - add `expo-build-properties` with `ios.useFrameworks: "dynamic"`
-  - the library works with both new and old arch, but is most efficient on new arch
-    - to enable new arch add `expo-build-properties` with `newArchEnabled: true`
-- Android
-  - @berend?
+## Getting Started
 
-# Installation in bare React Native projects
+First, install the module using your package manager.
 
-For bare React Native projects, you must ensure that you have [installed and configured the `expo` package](https://docs.expo.dev/bare/installing-expo-modules/) before continuing.
-
-### Add the package to your npm dependencies
-
+```sh
+npm install @animo-id/mdoc-data-transfer
 ```
-npm install @animo-id/expo-mdoc-data-transfer
+
+Then prebuild the application so the Expo Module wrapper can be added as native dependency:
+
+```sh
+npx expo prebuild
 ```
 
-### Configure for iOS
+### iOS
+
+For iOS installations, you need to follow the following steps:
+
+1. Add `expo-build-properties` with `ios.useFrameworks: "dynamic"`
+2. If you want to use the new architecture (more efficient), add `expo-build-properties` with `newArchEnabled: true`
 
 Run `USE_FRAMEWORKS=dynamic npx pod-install` after installing the npm package.
 
-### Configure for Android
+### Android
 
-# Contributing
+*Coming soon.*
 
-Contributions are very welcome! Please refer to guidelines described in the [contributing guide](https://github.com/expo/expo#contributing).
+## Usage
+
+You can import `@animo-id/mdoc-data-transfer` in your application.
+
+## Contributing
+
+Is there something you'd like to fix or add? Great, we love community contributions! To get involved, please follow our [contribution guidelines](https://github.com/animo/.github/blob/main/CONTRIBUTING.md).
+
+## License
+
+This repository is licensed under the [Apache 2.0](./LICENSE) license.
