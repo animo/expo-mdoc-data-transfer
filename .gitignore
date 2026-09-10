@@ -58,3 +58,7 @@ example/dist
 *.tgz
 
 tsconfig.tsbuildinfo
+
+# Copied into the package by the `prepack` script when publishing
+expo-sdk/README.md
+expo-sdk/LICENSE

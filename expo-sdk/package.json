@@ -10,6 +10,8 @@
 	"scripts": {
 		"build": "EXPO_NONINTERACTIVE=1 expo-module build && EXPO_NONINTERACTIVE=1 expo-module build plugin",
 		"types:check": "EXPO_NONINTERACTIVE=1 expo-module typecheck && EXPO_NONINTERACTIVE=1 expo-module typecheck --project plugin",
+		"prepack": "cp ../README.md ./README.md && cp ../LICENSE ./LICENSE",
+		"postpack": "rm -f ./README.md ./LICENSE",
 		"release": "release-it"
 	},
 	"keywords": [
