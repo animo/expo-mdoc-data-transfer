@@ -21,7 +21,6 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"preset": "recommended",
 			"performance": {
 				"noAccumulatingSpread": "off"
 			},

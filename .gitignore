@@ -56,3 +56,5 @@ example/android
 example/dist
 
 *.tgz
+
+tsconfig.tsbuildinfo
