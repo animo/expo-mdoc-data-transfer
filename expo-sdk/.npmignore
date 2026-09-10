@@ -1,5 +1,3 @@
-/.github
-/example
 /src/*.ts
 /android/build
 /android/.gradle
@@ -7,6 +5,5 @@
 plugin/src
 tsconfig.json
 .release-it.json
-biome.json
 
 *.tgz
